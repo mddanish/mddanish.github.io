@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mohammed Danish Amber | Cybersecurity Leader &amp; Adversary Simulator</title>
+  <meta name="description" content="Mohammed Danish Amber is an elite cybersecurity professional with over 14 years of expertise in Red Teaming, Adversary Emulation, Cloud Security, Vulnerability Management, and DevSecOps." />
+  <meta property="og:title" content="Mohammed Danish Amber | Cybersecurity Portfolio" />
+  <meta property="og:description" content="Adversary Simulator &amp; Cybersecurity Leader. 14+ years of validated expertise across Cognizant, Ernst &amp; Young, and Deloitte." />
+  <meta property="og:type" content="website" />
+  <link rel="canonical" href="https://www.mohammeddanishamber.com/" />
+  
+  <!-- Favicon placeholder using a cyber SVG -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23FF1F1F%22>⬡</text></svg>" />
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Cyber Canvas Backdrop -->
+<canvas id="cyber-canvas" aria-hidden="true"></canvas>
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<nav class="nav" role="navigation" aria-label="Main Navigation">
+  <div class="container nav-inner">
+    <a href="#home" class="nav-logo" aria-label="Danish Amber Home">
+      <span class="nav-logo-icon">⬢</span>
+      <span class="nav-logo-text">M. DANISH<span> AMBER</span></span>
+    </a>
+
+    <div class="nav-links">
+      <a href="#home" class="nav-link active">Home</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#experience" class="nav-link">Experience</a>
+      <a href="#skills" class="nav-link">Skills</a>
+      <a href="#certifications" class="nav-link">Credentials</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </div>
+
+    <!-- Links to PDF directly -->
+    <a href="Mohammed danish Amber.pdf" download class="btn btn-primary btn-sm nav-cta">Download CV</a>
+
+    <button class="nav-hamburger" aria-label="Toggle Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="nav-mobile-menu">
+    <a href="#home" class="nav-link">Home</a>
+    <a href="#about" class="nav-link">About</a>
+    <a href="#experience" class="nav-link">Experience</a>
+    <a href="#skills" class="nav-link">Skills</a>
+    <a href="#certifications" class="nav-link">Credentials</a>
+    <a href="#contact" class="nav-link">Contact</a>
+    <a href="Mohammed danish Amber.pdf" download class="btn btn-primary btn-sm" style="width:fit-content;margin-top:8px;">Download CV</a>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HERO SECTION
+     ============================================================ -->
+<header class="hero" id="home">
+  <div class="hero-grid-line" aria-hidden="true"></div>
+  <div class="hero-glow" aria-hidden="true"></div>
+
+  <div class="container">
+    <div class="grid-2" style="align-items:center; gap:4rem;">
+
+      <!-- Left: Bio introduction -->
+      <div class="hero-content fade-up">
+        <div class="hero-eyebrow">
+          <span style="display:inline-block;width:24px;height:1px;background:var(--core-red);"></span>
+          Adversary-Grade Cyber Risk Leader
+        </div>
+
+        <h1 class="hero-title" data-glitch="Mohammed Danish Amber">
+          Mohammed<br />
+          <span class="highlight">Danish</span> Amber
+        </h1>
+
+        <p class="hero-subtitle">
+          Over <strong>14 years of elite expertise</strong> in offensive security, vulnerability management, and breach emulation. Leading security operations and hardening defenses for global enterprise architectures.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#experience" class="btn btn-primary btn-lg btn-arrow">Explore Experience</a>
+          <a href="#contact" class="btn btn-ghost btn-lg">Get in Touch</a>
+        </div>
+      </div>
+
+      <!-- Right: Cyber Dashboard widget -->
+      <div class="fade-up" style="transition-delay:0.2s;">
+        <div class="bas-dashboard">
+          <div class="bas-header">
+            <div class="bas-title">// PROFILE SECURITY POSTURE</div>
+            <div class="bas-status">ACTIVE SESSION</div>
+          </div>
+
+          <!-- Dynamic score ring -->
+          <div class="bas-score-ring">
+            <svg width="150" height="150" viewBox="0 0 100 100" aria-label="Profile readiness 98%">
+              <!-- Track background -->
+              <circle cx="50" cy="50" r="40"
+                fill="none"
+                stroke="rgba(255,255,255,0.04)"
+                stroke-width="5"/>
+              <!-- Dynamic Fill -->
+              <circle cx="50" cy="50" r="40"
+                class="score-ring-fill"
+                fill="none"
+                stroke="var(--core-red)"
+                stroke-width="5"
+                stroke-linecap="round"
+                stroke-dasharray="251.2"
+                stroke-dashoffset="251.2"
+                transform="rotate(-90 50 50)"
+                style="transition: stroke-dashoffset 1.5s ease-out;"/>
+              <!-- Center Metric Text -->
+              <text x="50" y="47" text-anchor="middle"
+                fill="white" font-family="Rajdhani,sans-serif"
+                font-size="16" font-weight="700">
+                <tspan class="bas-score-number">0%</tspan>
+              </text>
+              <text x="50" y="58" text-anchor="middle"
+                fill="#888" font-family="Michroma,monospace" font-size="5">
+                READINESS SCORE
+              </text>
+            </svg>
+          </div>
+
+          <!-- Live stats grid -->
+          <div class="bas-metric-grid">
+            <div class="bas-metric">
+              <div class="bas-metric-val red" id="dash-vulns">0</div>
+              <div class="bas-metric-key">Years Experience</div>
+            </div>
+            <div class="bas-metric">
+              <div class="bas-metric-val text-white">10+</div>
+              <div class="bas-metric-key">Active Credentials</div>
+            </div>
+            <div class="bas-metric">
+              <div class="bas-metric-val text-white">Manager</div>
+              <div class="bas-metric-key">Cognizant Lead</div>
+            </div>
+            <div class="bas-metric">
+              <div class="bas-metric-val text-white" style="font-size:0.9rem;">OFFENSIVE</div>
+              <div class="bas-metric-key">Primary Domain</div>
+            </div>
+          </div>
+
+          <!-- Simulated capabilities status bars -->
+          <div style="margin-top:1rem;">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--steel-muted);margin-bottom:4px;">
+              <span style="font-family:var(--font-tech);letter-spacing:.08em;">RED TEAMING &amp; SIMULATION</span>
+              <span>95%</span>
+            </div>
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill" data-width="95%" style="width:0;"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--steel-muted);margin-bottom:4px;margin-top:10px;">
+              <span style="font-family:var(--font-tech);letter-spacing:.08em;">VULNERABILITY VALIDATION</span>
+              <span>92%</span>
+            </div>
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill" data-width="92%" style="width:0;background:linear-gradient(90deg,#eab308,#facc15);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+     CREDENTIAL BAND
+     ============================================================ -->
+<section class="section-sm" style="border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);background:rgba(10,10,10,0.6);" aria-label="Core Badges">
+  <div class="container">
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:2rem;justify-content:center;">
+      <div style="font-family:var(--font-tech);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--steel-muted);flex-shrink:0;">Certified Expertise</div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:1.5rem;align-items:center;">
+        <div class="cert-badge" style="font-family:var(--font-tech);font-size:11px;color:white;">⬡ OSCP</div>
+        <div class="cert-badge" style="font-family:var(--font-tech);font-size:11px;color:white;">⬡ GREM</div>
+        <div class="cert-badge" style="font-family:var(--font-tech);font-size:11px;color:white;">⬡ ECSA</div>
+        <div class="cert-badge" style="font-family:var(--font-tech);font-size:11px;color:white;">⬡ CEH</div>
+        <div class="cert-badge" style="font-family:var(--font-tech);font-size:11px;color:white;">⬡ CHFI</div>
+        <div class="cert-badge" style="font-family:var(--font-tech);font-size:11px;color:white;">⬡ CCSK</div>
+        <div class="cert-badge" style="font-family:var(--font-tech);font-size:11px;color:white;">⬡ RHCE</div>
+      </div>
+
+      <span class="chip" style="margin:0;flex-shrink:0;">APT Simulation</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ABOUT SECTION
+     ============================================================ -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="text-center mb-12 fade-up">
+      <span class="chip">Systems Audit</span>
+      <h2>Adversary Simulation, Engineered for Resilience</h2>
+    </div>
+
+    <div class="grid-2" style="align-items:start; gap:4rem;">
+      
+      <!-- Profile scan-line image -->
+      <div class="fade-up">
+        <div class="profile-image-container">
+          <div class="profile-frame">
+            <!-- Tech border corners -->
+            <div class="tech-corner corner-tl"></div>
+            <div class="tech-corner corner-tr"></div>
+            <div class="tech-corner corner-bl"></div>
+            <div class="tech-corner corner-br"></div>
+            
+            <!-- Laser scan animation layer -->
+            <div class="profile-scanner"></div>
+
+            <div class="profile-image-wrapper">
+              <img src="MDA.jpg" alt="Mohammed Danish Amber Profile Image" class="profile-img" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technical Bio -->
+      <div class="fade-up" style="transition-delay:0.15s;">
+        <h3 style="margin-bottom:1.5rem;" class="font-display">Cybersecurity Leader &amp; DevSecOps Architect</h3>
+        <p style="color:var(--steel-muted);line-height:1.8;margin-bottom:1rem;">
+          I am a senior cybersecurity professional and leader with **over 14 years of comprehensive experience** across offensive and defensive domains. Throughout my career, I have specialized in architecting and executing advanced **Adversary Simulations, Red Teaming, Vulnerability Management, and secure DevSecOps pipelines**.
+        </p>
+        <p style="color:var(--steel-muted);line-height:1.8;margin-bottom:1.5rem;">
+          In my current capacity as a **Manager within Cognizant Security**, I lead a dedicated team of elite security engineers. My focus is on proactively identifying system vulnerabilities, automating threat simulations, and strengthening the overall security controls of enterprise organizations. 
+        </p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:2rem;">
+          <div class="glass-card" style="padding:1.5rem;text-align:left;">
+            <div style="font-family:var(--font-tech);font-size:1.5rem;color:var(--core-red);font-weight:700;margin-bottom:0.25rem;">14+ Yrs</div>
+            <div style="font-size:11px;color:var(--steel-muted);text-transform:uppercase;letter-spacing:0.04em;">Enterprise IT &amp; Security</div>
+          </div>
+          <div class="glass-card" style="padding:1.5rem;text-align:left;">
+            <div style="font-family:var(--font-tech);font-size:1.5rem;color:var(--core-red);font-weight:700;margin-bottom:0.25rem;">6 - 10</div>
+            <div style="font-size:11px;color:var(--steel-muted);text-transform:uppercase;letter-spacing:0.04em;">Security Engineers Led</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     EXPERIENCE (TIMELINE)
+     ============================================================ -->
+<section class="section" id="experience" style="background:rgba(10,10,10,0.5);">
+  <div class="container">
+    <div class="text-center mb-12 fade-up">
+      <span class="chip">Operation History</span>
+      <h2>Chronology of Core Professional Milestones</h2>
+    </div>
+
+    <!-- Timeline Wrapper -->
+    <div class="timeline">
+
+      <!-- Cognizant -->
+      <div class="timeline-item fade-up">
+        <div class="timeline-dot"></div>
+        <div class="glass-card timeline-card">
+          <span class="timeline-date">APRIL 2019 — TILL DATE</span>
+          <h3 class="timeline-title">Manager</h3>
+          <div class="timeline-company">Cognizant Security // India</div>
+          <p class="timeline-desc">
+            Directing security testing programs across Web, Mobile (Android &amp; iOS), and Cloud infrastructures. Establishing DevSecOps standardization and overseeing active adversary simulations. Leading a high-performing technical engineering team.
+          </p>
+          <div class="timeline-tags">
+            <span class="tag-sm">DevSecOps</span>
+            <span class="tag-sm">Red Teaming</span>
+            <span class="tag-sm">EDR Validation</span>
+            <span class="tag-sm">Team of 10</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EY -->
+      <div class="timeline-item fade-up" style="transition-delay:0.1s;">
+        <div class="timeline-dot"></div>
+        <div class="glass-card timeline-card">
+          <span class="timeline-date">APRIL 2018 — APRIL 2019</span>
+          <h3 class="timeline-title">Senior Consultant</h3>
+          <div class="timeline-company">Ernst &amp; Young // Enterprise Cyber Risk</div>
+          <p class="timeline-desc">
+            Directed vulnerability and patch management lifecycles. Led secure system architecture audits, IoT device vulnerability assessments, and advanced red team operations.
+          </p>
+          <div class="timeline-tags">
+            <span class="tag-sm">Patch Management</span>
+            <span class="tag-sm">IoT Audits</span>
+            <span class="tag-sm">Malware Analysis</span>
+            <span class="tag-sm">Process Standards</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deloitte -->
+      <div class="timeline-item fade-up" style="transition-delay:0.2s;">
+        <div class="timeline-dot"></div>
+        <div class="glass-card timeline-card">
+          <span class="timeline-date">JUNE 2016 — DECEMBER 2017</span>
+          <h3 class="timeline-title">Solution Advisor</h3>
+          <div class="timeline-company">Deloitte // Cyber Risk</div>
+          <p class="timeline-desc">
+            Executed static and dynamic malware reverse engineering, active threat hunting, source code reviews, and penetration testing across enterprise applications.
+          </p>
+          <div class="timeline-tags">
+            <span class="tag-sm">Reverse Engineering</span>
+            <span class="tag-sm">Threat Hunting</span>
+            <span class="tag-sm">Source Code Review</span>
+            <span class="tag-sm">VAPT</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agility -->
+      <div class="timeline-item fade-up" style="transition-delay:0.3s;">
+        <div class="timeline-dot"></div>
+        <div class="glass-card timeline-card">
+          <span class="timeline-date">NOVEMBER 2015 — APRIL 2016</span>
+          <h3 class="timeline-title">Information Security Analyst</h3>
+          <div class="timeline-company">Agility E-Services</div>
+          <p class="timeline-desc">
+            Conducted deep system audits across core databases, firewalls, and network switches. Managed active log analysis, incident detection, and mitigated threats aligned with OWASP Top 10 guidelines.
+          </p>
+          <div class="timeline-tags">
+            <span class="tag-sm">Firewall Audits</span>
+            <span class="tag-sm">Log Analysis</span>
+            <span class="tag-sm">OWASP Alignment</span>
+            <span class="tag-sm">Incident Detection</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TCS -->
+      <div class="timeline-item fade-up" style="transition-delay:0.4s;">
+        <div class="timeline-dot"></div>
+        <div class="glass-card timeline-card">
+          <span class="timeline-date">NOVEMBER 2010 — OCTOBER 2015</span>
+          <h3 class="timeline-title">System Engineer</h3>
+          <div class="timeline-company">Tata Consultancy Services</div>
+          <p class="timeline-desc">
+            Managed database administrations (MySQL, MongoDB), server health monitoring, and system automation scripts. Recognized with Service Delivery Excellence and Best Faculty awards.
+          </p>
+          <div class="timeline-tags">
+            <span class="tag-sm">Database Admin</span>
+            <span class="tag-sm">System Automation</span>
+            <span class="tag-sm">Symantec Profiling</span>
+            <span class="tag-sm">TCS Awards</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     INTERACTIVE TECHNICAL SKILLS WIDGET
+     ============================================================ -->
+<section class="section" id="skills">
+  <div class="container">
+    <div class="text-center mb-12 fade-up">
+      <span class="chip">Capability Matrix</span>
+      <h2>Technical Skill Auditing &amp; Console</h2>
+    </div>
+
+    <div class="fade-up">
+      <div class="terminal-widget">
+        
+        <!-- Terminal header toolbar -->
+        <div class="terminal-header">
+          <div class="terminal-buttons">
+            <span class="terminal-btn red"></span>
+            <span class="terminal-btn yellow"></span>
+            <span class="terminal-btn green"></span>
+          </div>
+          <div class="terminal-title-text">SECURE SHELL // DANISH AMBER SKILLS CONSOLE</div>
+          <div style="width:36px;"></div> <!-- visual spacer -->
+        </div>
+
+        <!-- Terminal interior -->
+        <div class="terminal-body">
+          <!-- Command quick tabs -->
+          <div class="terminal-tabs">
+            <button class="term-tab active" data-cmd="hacking">show_hacking</button>
+            <button class="term-tab" data-cmd="tools">show_tools</button>
+            <button class="term-tab" data-cmd="sysops">show_platforms</button>
+            <button class="term-tab" data-cmd="languages">show_languages</button>
+          </div>
+
+          <!-- Typing command indicator line -->
+          <div class="terminal-input-line">
+            <span class="terminal-prompt">danish.amber@cyber-prompt:~$</span>
+            <span class="terminal-command-typing" id="terminal-command"></span>
+            <span class="terminal-cursor"></span>
+          </div>
+
+          <!-- Terminal content output target -->
+          <div id="terminal-text" style="margin-top:1.5rem;">
+            <!-- Fallback loading message or initial load -->
+            <div class="term-output">> CONNECTED. WAITING FOR SECURE SYSTEM INTERROGATION...</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CERTIFICATIONS & CREDENTIALS SHOWCASE
+     ============================================================ -->
+<section class="section" id="certifications" style="background:rgba(10,10,10,0.5);">
+  <div class="container">
+    <div class="text-center mb-12 fade-up">
+      <span class="chip">Industry Accreditations</span>
+      <h2>Validating Offensive &amp; Platform Expertise</h2>
+    </div>
+
+    <div class="certs-grid">
+      
+      <!-- OSCP -->
+      <div class="glass-card cert-card fade-up">
+        <div class="cert-icon">⬢</div>
+        <h3 class="cert-name">OSCP</h3>
+        <span class="cert-issuer">Offensive Security Certified Professional</span>
+        <span class="cert-year-badge">2018</span>
+      </div>
+
+      <!-- GREM -->
+      <div class="glass-card cert-card fade-up" style="transition-delay:0.1s;">
+        <div class="cert-icon">🧬</div>
+        <h3 class="cert-name">GREM</h3>
+        <span class="cert-issuer">GIAC Reverse Engineering Malware</span>
+        <span class="cert-year-badge">2016</span>
+      </div>
+
+      <!-- ECSA -->
+      <div class="glass-card cert-card fade-up" style="transition-delay:0.2s;">
+        <div class="cert-icon">🔬</div>
+        <h3 class="cert-name">ECSA</h3>
+        <span class="cert-issuer">EC-Council Certified Security Analyst</span>
+        <span class="cert-year-badge">2017</span>
+      </div>
+
+      <!-- CCSK -->
+      <div class="glass-card cert-card fade-up" style="transition-delay:0.3s;">
+        <div class="cert-icon">☁️</div>
+        <h3 class="cert-name">CCSK</h3>
+        <span class="cert-issuer">Cloud Security Alliance</span>
+        <span class="cert-year-badge">2019</span>
+      </div>
+
+      <!-- CEH -->
+      <div class="glass-card cert-card fade-up" style="transition-delay:0.4s;">
+        <div class="cert-icon">💻</div>
+        <h3 class="cert-name">CEH &amp; CHFI</h3>
+        <span class="cert-issuer">Certified Ethical Hacker // Forensics</span>
+        <span class="cert-year-badge">2011</span>
+      </div>
+
+      <!-- RHCE -->
+      <div class="glass-card cert-card fade-up" style="transition-delay:0.5s;">
+        <div class="cert-icon">🐧</div>
+        <h3 class="cert-name">RHCE &amp; RHSA</h3>
+        <span class="cert-issuer">Red Hat Certified Engineer // Admin</span>
+        <span class="cert-year-badge">2010</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     COMMUNITY & HOME LAB
+     ============================================================ -->
+<section class="section">
+  <div class="container">
+    <div class="grid-2">
+      
+      <!-- Community Leadership -->
+      <div class="glass-card fade-up" style="padding:2.5rem;">
+        <span class="chip">Community Contribution</span>
+        <h3 style="margin-bottom:1.5rem;" class="font-display">Cybersecurity Leadership &amp; Initiatives</h3>
+        
+        <div style="display:flex;flex-direction:column;gap:1.5rem;">
+          <div style="display:flex;align-items:flex-start;gap:1rem;">
+            <span style="color:var(--core-red);font-size:1.2rem;margin-top:2px;">⬡</span>
+            <div>
+              <div style="font-family:var(--font-display);font-weight:700;color:white;">Null Open Security Hyderabad Chapter</div>
+              <div style="font-size:13px;color:var(--steel-muted);margin-top:2px;">Active ex-core member leading offensive security community groups, organizing monthly technical sessions and threat briefings.</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:1rem;">
+            <span style="color:var(--core-red);font-size:1.2rem;margin-top:2px;">⬡</span>
+            <div>
+              <div style="font-family:var(--font-display);font-weight:700;color:white;">Raspberry Pi Hyderabad Chapter</div>
+              <div style="font-size:13px;color:var(--steel-muted);margin-top:2px;">Served as ex-chapter head organizing open hardware and secure embedded system design workshops and capture-the-flag hackathons.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Home Lab details -->
+      <div class="glass-card fade-up" style="padding:2.5rem; transition-delay:0.15s;">
+        <span class="chip">Home Lab Architecture</span>
+        <h3 style="margin-bottom:1.5rem;" class="font-display">Private Cyber Research Environment</h3>
+        <p style="color:var(--steel-muted);font-size:14px;line-height:1.7;margin-bottom:1.5rem;">
+          I maintain a dedicated, isolated hardware laboratory setup configured for proactive threat intelligence gathering, payload development, and reverse engineering.
+        </p>
+
+        <div style="display:flex;flex-direction:column;gap:0.75rem;">
+          <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.03);padding-bottom:8px;">
+            <span style="font-size:12px;font-family:var(--font-tech);color:var(--steel-muted);">VIRTUALIZATION</span>
+            <span style="font-size:12px;font-family:var(--font-tech);color:white;">Proxmox &amp; Ubuntu MicroCloud</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.03);padding-bottom:8px;">
+            <span style="font-size:12px;font-family:var(--font-tech);color:var(--steel-muted);">THREAT ANALYSIS</span>
+            <span style="font-size:12px;font-family:var(--font-tech);color:white;">REMnux &amp; FlareVM Sandbox</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.03);padding-bottom:8px;">
+            <span style="font-size:12px;font-family:var(--font-tech);color:var(--steel-muted);">NETWORK ISOLATION</span>
+            <span style="font-size:12px;font-family:var(--font-tech);color:white;">Hardware-segregated VLANs</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CONTACT SECTION
+     ============================================================ -->
+<section class="section" id="contact" style="background:rgba(10,10,10,0.5);">
+  <div class="container">
+    <div class="text-center mb-12 fade-up">
+      <span class="chip">Secure Communications</span>
+      <h2>Initiate Secure Engagement Session</h2>
+    </div>
+
+    <div class="contact-container">
+      
+      <!-- Contact details -->
+      <div class="fade-up">
+        <div class="glass-card" style="padding:2.5rem;">
+          <span class="chip">Transmission Details</span>
+          <h3 style="margin-bottom:1.5rem;" class="font-display">Danish Amber // Core Terminal</h3>
+
+          <div style="display:flex;flex-direction:column;gap:1.5rem;">
+            
+            <!-- Email -->
+            <div style="display:flex;align-items:center;gap:1rem;">
+              <span style="font-size:1.5rem;color:var(--core-red);">✉</span>
+              <div>
+                <div style="font-size:11px;color:var(--steel-muted);text-transform:uppercase;letter-spacing:0.04em;">Primary Transmission Channel</div>
+                <a href="mailto:me@mohammeddanishamber.com" class="text-white font-tech" style="font-size:0.9rem;">me@mohammeddanishamber.com</a>
+              </div>
+            </div>
+
+            <!-- Alternative Email -->
+            <div style="display:flex;align-items:center;gap:1rem;">
+              <span style="font-size:1.5rem;color:var(--core-red);">✉</span>
+              <div>
+                <div style="font-size:11px;color:var(--steel-muted);text-transform:uppercase;letter-spacing:0.04em;">Backup Secure Shell Mail</div>
+                <a href="mailto:md.danish.amber@live.com" class="text-white font-tech" style="font-size:0.9rem;">md.danish.amber@live.com</a>
+              </div>
+            </div>
+
+            <!-- Phones -->
+            <div style="display:flex;align-items:center;gap:1rem;">
+              <span style="font-size:1.5rem;color:var(--core-red);">☎</span>
+              <div>
+                <div style="font-size:11px;color:var(--steel-muted);text-transform:uppercase;letter-spacing:0.04em;">Telephone Channels</div>
+                <div class="text-white font-tech" style="font-size:0.9rem;">+91-•••••••••• // Available on Request</div>
+              </div>
+            </div>
+
+            <!-- Location -->
+            <div style="display:flex;align-items:center;gap:1rem;">
+              <span style="font-size:1.5rem;color:var(--core-red);">⬡</span>
+              <div>
+                <div style="font-size:11px;color:var(--steel-muted);text-transform:uppercase;letter-spacing:0.04em;">Physical Station Bounds</div>
+                <div class="text-white font-tech" style="font-size:0.9rem;">Kolkata, India // Exact Bounds Redacted</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact form -->
+      <div class="fade-up" style="transition-delay:0.15s;">
+        <div class="contact-terminal-form">
+          <form id="contact-form">
+            <div class="form-group">
+              <label for="form-name" class="form-label">Initiator Name // Identity</label>
+              <input type="text" id="form-name" class="form-input" required placeholder="eg. John Doe" />
+            </div>
+
+            <div class="form-group">
+              <label for="form-email" class="form-label">Return Transmission Channel (Email)</label>
+              <input type="email" id="form-email" class="form-input" required placeholder="eg. secure@domain.com" />
+            </div>
+
+            <div class="form-group">
+              <label for="form-subject" class="form-label">Packet Subject Category</label>
+              <input type="text" id="form-subject" class="form-input" required placeholder="eg. Consultation Engagement" />
+            </div>
+
+            <div class="form-group">
+              <label for="form-message" class="form-label">Message Payload Content</label>
+              <textarea id="form-message" class="form-input" required placeholder="Type your secure message payload..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">Initiate Secure Transmission</button>
+          </form>
+          
+          <div class="form-success-alert" id="form-success"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <div class="nav-logo" style="margin-bottom:0.5rem;">
+        <span class="nav-logo-icon">⬢</span>
+        <span class="nav-logo-text" style="font-size:0.9rem;">M. DANISH<span> AMBER</span></span>
+      </div>
+      <p style="font-size:12px;">© 2026 Mohammed Danish Amber. All rights reserved. Managed under personal domain protocols.</p>
+    </div>
+
+    <!-- Social channels -->
+    <div class="footer-socials">
+      <a href="https://www.linkedin.com/in/mohammed-danish-amber/" target="_blank" rel="noopener" class="footer-social" aria-label="LinkedIn" title="Connect on LinkedIn">in</a>
+      <a href="https://github.com/mddanish" target="_blank" rel="noopener" class="footer-social" aria-label="GitHub" title="Visit GitHub Workspace">⌥</a>
+      <a href="mailto:me@mohammeddanishamber.com" class="footer-social" aria-label="Email" title="Send Secure Email">✉</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Interactive Scripts -->
+<script src="app.js"></script>
+</body>
+</html>
