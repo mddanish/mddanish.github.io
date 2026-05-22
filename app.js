@@ -427,28 +427,94 @@
   /* -------------------------------------------------------
      7. CONTACT FORM TRANSMISSION ANIMATION
   ------------------------------------------------------- */
+  /* -------------------------------------------------------
+     7. CONTACT FORM TRANSMISSION ANIMATION WITH REAL WEB3FORMS ENDPOINT
+  ------------------------------------------------------- */
   const contactForm = document.getElementById('contact-form');
   if (contactForm) {
     contactForm.addEventListener('submit', e => {
       e.preventDefault();
+      
       const btn = contactForm.querySelector('button[type="submit"]');
       const successEl = document.getElementById('form-success');
       const originalText = btn.textContent;
 
+      // Extract form values
+      const nameVal = document.getElementById('form-name').value;
+      const emailVal = document.getElementById('form-email').value;
+      const subjectVal = document.getElementById('form-subject').value;
+      const messageVal = document.getElementById('form-message').value;
+
+      // Disallow clicking twice and show loading state
       btn.disabled = true;
-      btn.textContent = 'Transmitting Encrypted SSH packets...';
+      btn.textContent = 'Encrypting & Transmitting Packets...';
       btn.style.borderColor = 'var(--core-red)';
       btn.style.boxShadow = 'var(--shadow-red)';
 
-      setTimeout(() => {
-        btn.textContent = '✓ Packet Transmission Complete';
-        btn.style.background = '#10b981';
-        btn.style.borderColor = '#10b981';
-        btn.style.boxShadow = '0 0 15px rgba(16,185,129,0.4)';
+      // Prepare request payload for Web3Forms
+      const payload = {
+        access_key: "1f5df270-8962-4f49-98f3-62a291794f80",
+        name: nameVal,
+        email: emailVal,
+        subject: subjectVal,
+        message: messageVal,
+        from_name: "Mohammed Danish Amber Portfolio"
+      };
+
+      // Perform real transmission
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(async response => {
+        let res = await response.json();
+        if (response.status === 200 && res.success) {
+          // Success State
+          btn.textContent = '✓ Packet Transmission Complete';
+          btn.style.background = '#10b981';
+          btn.style.borderColor = '#10b981';
+          btn.style.boxShadow = '0 0 15px rgba(16,185,129,0.4)';
+          
+          if (successEl) {
+            successEl.style.display = 'block';
+            successEl.style.color = '#10b981';
+            successEl.style.borderColor = 'rgba(16,185,129,0.3)';
+            successEl.style.background = 'rgba(16,185,129,0.06)';
+            successEl.textContent = '✓ Secure Connection Established. Message Encrypted and Sent to Danish Amber.';
+          }
+
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = originalText;
+            btn.style.background = '';
+            btn.style.borderColor = '';
+            btn.style.boxShadow = '';
+            contactForm.reset();
+            if (successEl) successEl.style.display = 'none';
+          }, 4000);
+        } else {
+          // Error State from Server
+          throw new Error(res.message || 'Validation error');
+        }
+      })
+      .catch(error => {
+        // Fail State
+        console.error('Web3Forms Error:', error);
+        btn.textContent = '✗ Transmission Failed';
+        btn.style.background = '#ef4444';
+        btn.style.borderColor = '#ef4444';
+        btn.style.boxShadow = '0 0 15px rgba(239,68,68,0.4)';
         
         if (successEl) {
           successEl.style.display = 'block';
-          successEl.textContent = '✓ Secure Connection Form Established. Message Encrypted and Sent to Danish Amber.';
+          successEl.style.color = '#ef4444';
+          successEl.style.borderColor = 'rgba(239,68,68,0.3)';
+          successEl.style.background = 'rgba(239,68,68,0.06)';
+          successEl.textContent = `✗ Packet Error: ${error.message || 'Network Transmission Interrupted.'}`;
         }
 
         setTimeout(() => {
@@ -457,10 +523,9 @@
           btn.style.background = '';
           btn.style.borderColor = '';
           btn.style.boxShadow = '';
-          contactForm.reset();
           if (successEl) successEl.style.display = 'none';
-        }, 4000);
-      }, 1600);
+        }, 5000);
+      });
     });
   }
 
