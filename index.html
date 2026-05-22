@@ -15,6 +15,9 @@
   
   <!-- CSS Stylesheet -->
   <link rel="stylesheet" href="style.css" />
+  
+  <!-- Zero-Config hCaptcha API -->
+  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
 </head>
 <body>
 
@@ -620,6 +623,11 @@
             <div class="form-group">
               <label for="form-message" class="form-label">Message Payload Content</label>
               <textarea id="form-message" class="form-input" required placeholder="Type your secure message payload..."></textarea>
+            </div>
+
+            <!-- Zero-Config Human Verification (hCaptcha Dark Theme) -->
+            <div class="form-group" style="display: flex; justify-content: center; margin-bottom: 1.5rem;">
+              <div class="h-captcha" data-sitekey="50b2fe65-b00b-4b9e-ad62-3ba471098be2" data-theme="dark"></div>
             </div>
 
             <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">Initiate Secure Transmission</button>
