@@ -445,6 +445,36 @@
       const subjectVal = document.getElementById('form-subject').value;
       const messageVal = document.getElementById('form-message').value;
 
+      // Extract hCaptcha response token
+      const captchaEl = contactForm.querySelector('[name="h-captcha-response"]');
+      const captchaVal = captchaEl ? captchaEl.value : '';
+
+      // Client-side Validation: Verify hCaptcha is completed
+      if (!captchaVal) {
+        btn.disabled = false;
+        btn.textContent = '✗ Solve Human Verification';
+        btn.style.background = '#ef4444';
+        btn.style.borderColor = '#ef4444';
+        btn.style.boxShadow = '0 0 15px rgba(239,68,68,0.4)';
+        
+        if (successEl) {
+          successEl.style.display = 'block';
+          successEl.style.color = '#ef4444';
+          successEl.style.borderColor = 'rgba(239,68,68,0.3)';
+          successEl.style.background = 'rgba(239,68,68,0.06)';
+          successEl.textContent = '✗ Verification Required: Please complete the "I am human" captcha check above.';
+        }
+
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.background = '';
+          btn.style.borderColor = '';
+          btn.style.boxShadow = '';
+          if (successEl) successEl.style.display = 'none';
+        }, 4000);
+        return;
+      }
+
       // Disallow clicking twice and show loading state
       btn.disabled = true;
       btn.textContent = 'Encrypting & Transmitting Packets...';
@@ -458,6 +488,7 @@
         email: emailVal,
         subject: subjectVal,
         message: messageVal,
+        "h-captcha-response": captchaVal,
         from_name: "Mohammed Danish Amber Portfolio"
       };
 
@@ -494,6 +525,9 @@
             btn.style.borderColor = '';
             btn.style.boxShadow = '';
             contactForm.reset();
+            if (typeof hcaptcha !== 'undefined') {
+              hcaptcha.reset();
+            }
             if (successEl) successEl.style.display = 'none';
           }, 4000);
         } else {
