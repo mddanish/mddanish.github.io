@@ -485,6 +485,27 @@
 </section>
 
 <!-- ============================================================
+     RECENT INTELLIGENCE & RESEARCH (BLOG)
+     ============================================================ -->
+<section class="section" id="blog">
+  <div class="container">
+    <div class="text-center mb-12 fade-up">
+      <span class="chip">Intelligence &amp; Research</span>
+      <h2>Latest Threat Advisories &amp; Research Dossiers</h2>
+    </div>
+
+    <!-- Container for dynamic blog cards snippet -->
+    <div class="blog-grid" id="homepage-blog-container">
+      <!-- Loaded dynamically by JS from window.BLOGS_DATA -->
+    </div>
+
+    <div class="text-center" style="margin-top: 3.5rem;">
+      <a href="blog.html" class="btn btn-ghost btn-lg">Explore Entire Intel Feed →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
      COMMUNITY & HOME LAB
      ============================================================ -->
 <section class="section">
@@ -666,6 +687,7 @@
 </footer>
 
 <!-- Interactive Scripts -->
+<script src="blogs-data.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
