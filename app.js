@@ -606,4 +606,50 @@
 
   document.querySelectorAll('.progress-bar-track').forEach(el => progressObserver.observe(el));
 
+  /* -------------------------------------------------------
+     11. HOMEPAGE BLOG CARDS SNIPPET LOADER
+  ------------------------------------------------------- */
+  const homepageBlogContainer = document.getElementById('homepage-blog-container');
+  if (homepageBlogContainer) {
+    const blogs = window.BLOGS_DATA || [];
+    // Display the 2 most recent blogs on the homepage
+    const recentBlogs = blogs.slice(0, 2);
+    if (recentBlogs.length === 0) {
+      homepageBlogContainer.innerHTML = `
+        <div class="glass-card" style="grid-column: 1 / -1; padding: 2rem; text-align: center;">
+          <h4 style="color: var(--core-red);">No Intel Feeds Found</h4>
+          <p style="color: var(--steel-muted); font-size: 0.9rem;">Check connection to blogs-data.js database.</p>
+        </div>
+      `;
+    } else {
+      homepageBlogContainer.innerHTML = recentBlogs.map(post => `
+        <div class="glass-card blog-card" style="padding: 2.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="blog-meta">
+              <span class="blog-category">${post.category}</span>
+              <span>•</span>
+              <span>${post.date}</span>
+              <span>•</span>
+              <span>${post.readTime}</span>
+            </div>
+            <h3 style="font-size: 1.35rem; margin: 0 0 1rem; color: var(--white); font-family: var(--font-display); line-height: 1.4;">
+              ${post.title}
+            </h3>
+            <p style="color: var(--steel-muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1.5rem;">
+              ${post.excerpt}
+            </p>
+          </div>
+          <div>
+            <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+              ${post.tags.map(t => `<span class="tag" style="font-size: 8px;">${t}</span>`).join('')}
+            </div>
+            <a href="blog.html?post=${post.slug}" class="btn btn-ghost btn-sm" style="width: fit-content;">
+              Read Research Dossier →
+            </a>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
 })();
