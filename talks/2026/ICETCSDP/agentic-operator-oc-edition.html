@@ -1,0 +1,2548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Agentic Operator — OpenCode Edition — Mohammed Danish Amber</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#FF1F1F;--red-dim:#cc1a1a;
+  --bg:#080808;--bg2:#101010;--bg3:#181818;--bg4:#1e1e1e;
+  --border:#252525;--border2:#333;
+  --text:#ececec;--muted:#777;--dim:#444;
+  --green:#4caf50;--amber:#f0a500;--blue:#7ec8e3;
+  --mono:'Share Tech Mono',monospace;
+  --head:'Barlow Condensed',sans-serif;
+  --body:'Barlow',sans-serif;
+}
+
+/* ── RESET & BASE ── */
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;font-weight:400}
+#app{display:block;height:100vh;position:relative;overflow:hidden}
+
+/* ── ANIMATED BACKGROUND ── */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.38}
+
+/* ── DECK ── */
+#deck{position:absolute;top:0;left:0;right:0;bottom:44px;overflow:hidden;z-index:1}
+.slide{position:absolute;inset:0;width:100%;height:100%;display:none;flex-direction:column;padding:40px 56px 28px;opacity:0;transition:opacity 0.3s;overflow:hidden}
+.slide.active{display:flex;opacity:1;overflow:hidden}
+
+/* ── TYPOGRAPHY SYSTEM (large-screen tuned) ── */
+.slide-label{font-family:var(--mono);font-size:11px;color:var(--red);letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;font-weight:400}
+.slide-title{font-family:var(--head);font-size:clamp(34px,4vw,58px);font-weight:900;line-height:1.0;color:#fff;margin-bottom:8px;letter-spacing:-0.5px}
+.accent{color:var(--red)}
+.slide-sub{font-size:17px;color:var(--muted);font-weight:400;margin-bottom:26px;letter-spacing:0.2px;line-height:1.4}
+.content{flex:1;display:flex;flex-direction:column;justify-content:center;gap:0}
+.content.top{justify-content:flex-start}
+.red-line{width:52px;height:3px;background:var(--red);margin-bottom:18px;border-radius:1px}
+
+/* ── BULLET LIST ── */
+.blist{list-style:none;display:flex;flex-direction:column;gap:13px}
+.blist li{display:flex;align-items:flex-start;gap:14px;font-size:16px;line-height:1.6;color:var(--text)}
+.blist li::before{content:'//';font-family:var(--mono);color:var(--red);font-size:12px;margin-top:3px;flex-shrink:0;letter-spacing:1px}
+.blist li strong{color:#fff;font-weight:700}
+.blist li em{color:var(--muted);font-style:italic}
+
+/* ── GRID LAYOUTS ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:18px 20px}
+.card-title{font-family:var(--head);font-size:13px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px}
+.card p{font-size:14px;line-height:1.65;color:#bbb;font-weight:400}
+.card p+p{margin-top:7px}
+.card.accent-border{border-color:var(--red)}
+.card.green-border{border-color:#2d7a2d}
+.card.danger-border{border-color:#cc3333}
+.card.dark{background:var(--bg3)}
+
+/* ── CODE BLOCK ── */
+.code{background:#080808;border:1px solid var(--border2);border-left:3px solid var(--red);border-radius:4px;padding:14px 16px;font-family:var(--mono);font-size:13px;line-height:1.8;color:#ccc;overflow-x:auto;white-space:pre}
+.code .k{color:var(--red)}.code .s{color:#82e0a0}.code .c{color:#444}.code .n{color:var(--blue)}
+
+/* ── TABLE ── */
+.dtable{width:100%;border-collapse:collapse;font-size:14px}
+.dtable th{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--red);border-bottom:1px solid var(--border2);padding:9px 10px;text-align:left;text-transform:uppercase;white-space:nowrap;font-weight:400}
+.dtable td{padding:10px 10px;border-bottom:1px solid var(--border);color:#bbb;line-height:1.5;vertical-align:middle}
+.dtable tr:last-child td{border-bottom:none}
+.dtable td:first-child{color:#fff;font-weight:600}
+.dtable tr:hover td{background:rgba(255,31,31,0.03)}
+.badge{display:inline-block;font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:2px;letter-spacing:1px;font-weight:400}
+.by{background:#0d2a0d;color:var(--green);border:1px solid #1a4d1a}
+.bp{background:#2a1f00;color:var(--amber);border:1px solid #4d3700}
+
+/* ── FLOW BOXES (Think→Act→Observe + Manual Loop) ── */
+.flow-row{display:flex;align-items:stretch;gap:0;width:100%}
+.flow-box{background:var(--bg2);border:1px solid var(--border2);border-radius:5px;flex:1;text-align:center;display:flex;flex-direction:column;justify-content:center;padding:14px 10px;min-height:72px}
+.flow-box.hl{border-color:var(--red);background:rgba(255,31,31,0.04)}
+.flow-box .fb-title{font-family:var(--head);font-size:14px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:1px}
+.flow-box .fb-desc{font-size:12px;color:#555;margin-top:4px;line-height:1.4}
+.flow-arrow{display:flex;align-items:center;justify-content:center;color:var(--red);font-family:var(--mono);font-size:18px;padding:0 8px;flex-shrink:0;font-weight:700}
+
+/* ── KILL CHAIN ── */
+.chain-step{display:flex;align-items:flex-start;gap:16px;padding:10px 0;border-bottom:1px solid var(--border)}
+.chain-step:last-child{border-bottom:none}
+.chain-num{font-family:var(--head);font-size:28px;font-weight:900;color:var(--red);line-height:1;flex-shrink:0;width:32px;margin-top:1px}
+.chain-body{flex:1}
+.chain-main{font-size:15px;color:#fff;font-weight:600;line-height:1.4}
+.chain-aside{font-family:var(--mono);font-size:11px;color:#444;margin-top:2px}
+
+/* ── PROFILE BARS ── */
+.prow{display:flex;align-items:center;gap:16px;padding:10px 0;border-bottom:1px solid var(--border)}
+.prow:last-child{border-bottom:none}
+.pname{font-family:var(--mono);font-size:12px;color:#fff;width:130px;flex-shrink:0;font-weight:400;letter-spacing:1px}
+.pbar{flex:1;height:6px;background:var(--border2);border-radius:3px;overflow:hidden}
+.pfill-bar{height:100%;border-radius:3px;background:var(--red);transition:width 1s ease}
+.plabel{font-size:13px;color:var(--muted);width:220px;flex-shrink:0}
+
+/* ── STACK LINES ── */
+.sline{padding:7px 11px;font-family:var(--mono);font-size:13px;color:#777;line-height:1.5;letter-spacing:0.3px}
+.sline.hl{background:var(--bg3);color:#ccc}
+.sline .r{color:var(--red)}
+
+/* ── VS COLUMNS ── */
+.vcol-head{font-family:var(--head);font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:13px;border-bottom:1px solid var(--border2);padding-bottom:9px}
+.vcol-head.bad{color:#cc3333}.vcol-head.good{color:var(--green)}
+.vitem{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:14px;color:#bbb;line-height:1.55}
+.vitem::before{content:'✗';color:#cc3333;flex-shrink:0;font-size:13px;margin-top:1px}
+.vright .vitem::before{content:'✓';color:var(--green)}
+
+/* ── ARCH BOXES ── */
+.arch-row{display:flex;align-items:stretch;gap:0;margin-bottom:10px}
+.abox{background:var(--bg2);border:1px solid var(--border2);padding:14px 16px;flex:1}
+.abox:first-child{border-radius:5px 0 0 5px}
+.abox:last-child{border-radius:0 5px 5px 0}
+.abox.solo{border-radius:5px}
+.abox.acc{border-color:var(--red)}
+.abox.danger{border-color:#cc3333}
+.ab-title{font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:2px;margin-bottom:6px;text-transform:uppercase}
+.ab-body{font-size:13px;color:#777;line-height:1.55}
+.ab-body strong{color:#ccc;font-weight:600}
+.aarr{display:flex;align-items:center;justify-content:center;color:var(--red);font-family:var(--mono);font-size:18px;flex-shrink:0;padding:0 6px;font-weight:700}
+
+/* ── IMPL CARDS ── */
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.icard{background:var(--bg2);border:1px solid var(--border2);border-radius:5px;padding:16px 18px}
+.icard.d{border-color:#cc3333}.icard.s{border-color:#2d7a2d}
+.icard .ic-head{font-family:var(--head);font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:9px}
+.icard.d .ic-head{color:#cc3333}.icard.s .ic-head{color:var(--green)}
+.icard ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.icard ul li{font-size:13px;color:#999;padding-left:16px;position:relative;line-height:1.5}
+.icard.d ul li::before{content:'✗';position:absolute;left:0;color:#cc3333;font-size:11px}
+.icard.s ul li::before{content:'✓';position:absolute;left:0;color:var(--green);font-size:11px}
+
+/* ── PILLS ── */
+.pill{display:inline-block;font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:12px;letter-spacing:1px;margin:3px}
+.pr{background:#200000;color:var(--red);border:1px solid #4d0000}
+.pg{background:var(--bg3);color:#666;border:1px solid var(--border2)}
+.pgg{background:#0a1f0a;color:var(--green);border:1px solid #1a4d1a}
+
+/* ── QUOTE ── */
+.bquote{font-family:var(--head);font-size:clamp(20px,2.6vw,34px);font-weight:700;line-height:1.3;color:#fff;border-left:4px solid var(--red);padding-left:22px;margin-bottom:18px}
+.qsrc{font-family:var(--mono);font-size:11px;color:var(--red);letter-spacing:2px}
+
+/* ── BIG STAT ── */
+.big-stat{font-family:var(--head);font-size:48px;font-weight:900;color:var(--red);line-height:1}
+.big-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:3px}
+
+/* ── HUMOR BOX ── */
+.humor-box{background:rgba(240,165,0,0.05);border:1px solid rgba(240,165,0,0.2);border-left:3px solid var(--amber);border-radius:4px;padding:11px 15px;font-family:var(--mono);font-size:12px;color:var(--amber);line-height:1.65;margin-top:12px}
+
+/* ── NEVERBREACHED ── */
+.nb-site{background:#f5f6fa;border-radius:7px;overflow:hidden;display:flex;flex-direction:column;font-family:'Arial',sans-serif;border:1px solid #ddd}
+.nb-nav{background:#1a3a5c;padding:9px 18px;display:flex;align-items:center;justify-content:space-between}
+.nb-logo{color:#fff;font-weight:900;font-size:13px;letter-spacing:0.5px}
+.nb-navlinks{display:flex;gap:16px}
+.nb-navlinks a{color:#9ab;font-size:11px;text-decoration:none}
+.nb-hero{background:linear-gradient(135deg,#1a3a5c,#0d2035);padding:22px 24px 18px;text-align:center}
+.nb-tagline{color:rgba(255,255,255,0.6);font-size:10px;letter-spacing:4px;text-transform:uppercase;margin-bottom:7px}
+.nb-h1{color:#fff;font-size:18px;font-weight:900;margin-bottom:7px;line-height:1.3}
+.nb-sub{color:#7ec8e3;font-size:11px;margin-bottom:14px}
+.nb-cta{background:#e63946;color:#fff;border:none;padding:8px 20px;font-size:11px;border-radius:3px;font-weight:700;cursor:default;letter-spacing:0.5px}
+.nb-stats{display:flex;justify-content:center;gap:28px;margin-top:14px}
+.nb-stat .n{color:#FF1F1F;font-weight:900;font-size:18px}
+.nb-stat .l{color:#aaa;font-size:9px;letter-spacing:1px}
+.nb-features{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px 16px;background:#fff;flex:1}
+.nb-feat{border:1px solid #e5e5e5;border-radius:5px;padding:10px 8px;text-align:center}
+.nb-feat .fi{font-size:18px;margin-bottom:5px}
+.nb-feat .ft{font-size:10px;font-weight:700;color:#1a3a5c}
+.nb-feat .fd{font-size:9px;color:#999;margin-top:3px;line-height:1.3}
+.nb-footer{background:#0d1117;padding:7px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.nb-footer span{color:#444;font-size:9px;font-family:monospace}
+.nb-footer .nb-secure{color:#4caf50;font-size:9px}
+
+/* ── NAV BAR ── */
+#nav{display:flex;align-items:center;justify-content:space-between;padding:10px 60px;border-top:1px solid var(--border);background:var(--bg);z-index:100;position:fixed;bottom:0;left:0;right:0;height:44px}
+.nleft{display:flex;align-items:center;gap:12px;flex:1}
+.nbtn{background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:11px;padding:6px 14px;border-radius:3px;cursor:pointer;transition:all 0.15s;letter-spacing:1px}
+.nbtn:hover:not(:disabled){border-color:var(--red);color:var(--red)}
+.nbtn:disabled{opacity:0.25;cursor:default}
+#pbar{flex:1;height:2px;background:var(--border2);border-radius:1px;overflow:hidden;margin:0 14px}
+#pfill{height:100%;background:var(--red);border-radius:1px;transition:width 0.3s}
+#ptxt{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:2px;white-space:nowrap}
+
+
+
+
+/* ── DECOR SVG ── */
+.decor{position:absolute;right:0;bottom:0;opacity:0.04;pointer-events:none;overflow:hidden}
+
+/* ── CONTENT ANIMATIONS ── */
+@keyframes pulse-ring {
+  0%   { transform:scale(1);   opacity:0.6 }
+  100% { transform:scale(1.8); opacity:0   }
+}
+@keyframes slide-fade-up {
+  from { opacity:0; transform:translateY(20px) }
+  to   { opacity:1; transform:translateY(0)    }
+}
+@keyframes fade-in {
+  from { opacity:0 }
+  to   { opacity:1 }
+}
+@keyframes draw-line {
+  from { stroke-dashoffset:200 }
+  to   { stroke-dashoffset:0   }
+}
+@keyframes glow-pulse {
+  0%,100% { box-shadow:0 0 8px rgba(255,31,31,0.2)  }
+  50%      { box-shadow:0 0 22px rgba(255,31,31,0.5) }
+}
+
+/* Slide enter animation — all direct children stagger in */
+.slide.active > * {
+  animation: slide-fade-up 0.45s ease both;
+}
+.slide.active > *:nth-child(1) { animation-delay:0.05s }
+.slide.active > *:nth-child(2) { animation-delay:0.12s }
+.slide.active > *:nth-child(3) { animation-delay:0.19s }
+.slide.active > *:nth-child(4) { animation-delay:0.26s }
+.slide.active > *:nth-child(5) { animation-delay:0.33s }
+
+/* Cards shimmer on hover */
+.card { transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s }
+.card:hover { transform:translateY(-2px); box-shadow:0 4px 24px rgba(255,31,31,0.1) }
+
+/* Flow boxes pulse on active slide */
+.slide.active .flow-box.hl { animation: glow-pulse 2.5s ease-in-out infinite 0.5s }
+
+/* Profile bars animate width on enter */
+.slide.active .pfill-bar { transition: width 1.2s ease 0.6s }
+
+/* Table rows fade in staggered */
+.slide.active .dtable tbody tr {
+  animation: fade-in 0.4s ease both;
+}
+.slide.active .dtable tbody tr:nth-child(1) { animation-delay:0.3s }
+.slide.active .dtable tbody tr:nth-child(2) { animation-delay:0.42s }
+.slide.active .dtable tbody tr:nth-child(3) { animation-delay:0.54s }
+.slide.active .dtable tbody tr:nth-child(4) { animation-delay:0.66s }
+.slide.active .dtable tbody tr:nth-child(5) { animation-delay:0.78s }
+.slide.active .dtable tbody tr:nth-child(6) { animation-delay:0.90s }
+.slide.active .dtable tbody tr:nth-child(7) { animation-delay:1.02s }
+
+/* Kill chain steps stagger */
+.slide.active .chain-step {
+  animation: slide-fade-up 0.4s ease both;
+}
+.slide.active .chain-step:nth-child(1)  { animation-delay:0.2s  }
+.slide.active .chain-step:nth-child(2)  { animation-delay:0.32s }
+.slide.active .chain-step:nth-child(3)  { animation-delay:0.44s }
+.slide.active .chain-step:nth-child(4)  { animation-delay:0.56s }
+.slide.active .chain-step:nth-child(5)  { animation-delay:0.68s }
+.slide.active .chain-step:nth-child(6)  { animation-delay:0.80s }
+.slide.active .chain-step:nth-child(7)  { animation-delay:0.92s }
+
+/* Bullet list items stagger */
+.slide.active .blist li {
+  animation: slide-fade-up 0.4s ease both;
+}
+.slide.active .blist li:nth-child(1) { animation-delay:0.25s }
+.slide.active .blist li:nth-child(2) { animation-delay:0.37s }
+.slide.active .blist li:nth-child(3) { animation-delay:0.49s }
+.slide.active .blist li:nth-child(4) { animation-delay:0.61s }
+.slide.active .blist li:nth-child(5) { animation-delay:0.73s }
+
+/* flow-box stagger */
+.slide.active .flow-box {
+  animation: slide-fade-up 0.4s ease both;
+}
+.slide.active .flow-row .flow-box:nth-child(1)  { animation-delay:0.2s  }
+.slide.active .flow-row .flow-box:nth-child(3)  { animation-delay:0.35s }
+.slide.active .flow-row .flow-box:nth-child(5)  { animation-delay:0.50s }
+.slide.active .flow-row .flow-box:nth-child(7)  { animation-delay:0.65s }
+.slide.active .flow-row .flow-box:nth-child(9)  { animation-delay:0.80s }
+.slide.active .flow-row .flow-box:nth-child(11) { animation-delay:0.95s }
+
+/* impl cards stagger */
+.slide.active .icard {
+  animation: slide-fade-up 0.4s ease both;
+}
+.slide.active .icard:nth-child(1) { animation-delay:0.2s  }
+.slide.active .icard:nth-child(2) { animation-delay:0.38s }
+
+/* Three-col cards stagger */
+.slide.active .three-col .card {
+  animation: slide-fade-up 0.4s ease both;
+}
+.slide.active .three-col .card:nth-child(1) { animation-delay:0.2s  }
+.slide.active .three-col .card:nth-child(2) { animation-delay:0.34s }
+.slide.active .three-col .card:nth-child(3) { animation-delay:0.48s }
+.slide.active .three-col .card:nth-child(4) { animation-delay:0.62s }
+.slide.active .three-col .card:nth-child(5) { animation-delay:0.76s }
+.slide.active .three-col .card:nth-child(6) { animation-delay:0.90s }
+
+/* Quote slides */
+.slide.active .bquote {
+  animation: slide-fade-up 0.6s ease both 0.3s;
+}
+
+/* Code blocks */
+.slide.active .code {
+  animation: fade-in 0.5s ease both 0.4s;
+}
+
+/* ── AI RED TEAM DIAGRAM SLIDE ── */
+.cy-num {
+  font-family:var(--head);
+  font-size:22px;
+  font-weight:900;
+  color:#555;
+  line-height:1;
+}
+.cy-title {
+  font-family:var(--head);
+  font-size:13px;
+  font-weight:700;
+  color:#ccc;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  line-height:1.3;
+}
+.cy-body {
+  font-size:11.5px;
+  color:#666;
+  line-height:1.5;
+  flex:1;
+}
+.cy-tag {
+  font-family:var(--mono);
+  font-size:9px;
+  padding:3px 7px;
+  border:1px solid;
+  border-radius:2px;
+  text-align:center;
+  letter-spacing:1px;
+  margin-top:auto;
+  flex-shrink:0;
+}
+.cy-arrow {
+  display:flex;
+  align-items:center;
+  color:var(--red);
+  font-family:var(--mono);
+  font-size:14px;
+  padding:0 4px;
+  flex-shrink:0;
+  margin-bottom:20px;
+}
+.cycle-step {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:5px;
+  padding:10px 10px 8px;
+}
+.cycle-step:hover {
+  border-color:var(--border2);
+  background:var(--bg3);
+}
+
+/* BloodHound graph canvas dots */
+@keyframes bh-node-pulse {
+  0%,100% { r:3 }
+  50%      { r:5 }
+}
+
+
+/* ══════════════════════════════════════════════
+   SLIDE-SPECIFIC ANIMATED SYMBOLS
+══════════════════════════════════════════════ */
+
+/* Terminal cursor blink */
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.term-cursor {
+  display:inline-block;width:8px;height:16px;
+  background:var(--red);vertical-align:middle;
+  animation:blink 1s step-end infinite;
+  margin-left:2px;border-radius:1px;
+}
+
+/* Data packet travelling along a path */
+@keyframes packet-travel {
+  0%   { left:0%;   opacity:0 }
+  10%  { opacity:1 }
+  90%  { opacity:1 }
+  100% { left:100%; opacity:0 }
+}
+.data-packet {
+  position:absolute;width:8px;height:8px;border-radius:50%;
+  background:var(--red);top:50%;transform:translateY(-50%);
+  animation:packet-travel 2s linear infinite;
+  box-shadow:0 0 6px var(--red);
+}
+
+/* Pulse dot */
+@keyframes pulse-dot {
+  0%,100%{ transform:scale(1);   opacity:0.8 }
+  50%    { transform:scale(1.5); opacity:1   }
+}
+.pulse-dot {
+  width:10px;height:10px;border-radius:50%;background:var(--red);
+  display:inline-block;animation:pulse-dot 1.4s ease-in-out infinite;
+}
+
+/* Typewriter */
+@keyframes type-in {
+  from { max-width:0 }
+  to   { max-width:100% }
+}
+.typewrite {
+  overflow:hidden;white-space:nowrap;
+  animation:type-in 0.8s steps(30,end) both;
+}
+
+/* Scan line sweep */
+@keyframes scan-line {
+  0%   { top:-2px }
+  100% { top:100% }
+}
+.scan-line {
+  position:absolute;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--red),transparent);
+  animation:scan-line 3s linear infinite;pointer-events:none;opacity:0.5;
+}
+
+/* Orbit */
+@keyframes orbit {
+  from { transform:rotate(0deg)   translateX(70px) rotate(0deg)   }
+  to   { transform:rotate(360deg) translateX(70px) rotate(-360deg)}
+}
+@keyframes orbit2 {
+  from { transform:rotate(120deg)  translateX(70px) rotate(-120deg)  }
+  to   { transform:rotate(480deg)  translateX(70px) rotate(-480deg)  }
+}
+@keyframes orbit3 {
+  from { transform:rotate(240deg)  translateX(70px) rotate(-240deg)  }
+  to   { transform:rotate(600deg)  translateX(70px) rotate(-600deg)  }
+}
+.orbit-wrap {
+  position:relative;width:160px;height:160px;
+  flex-shrink:0;
+}
+.orbit-center {
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,31,31,0.12);border:2px solid var(--red);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--head);font-size:13px;font-weight:900;color:var(--red);
+  z-index:2;
+}
+.orbit-ring {
+  position:absolute;top:50%;left:50%;
+  width:140px;height:140px;border-radius:50%;
+  border:1px solid rgba(255,31,31,0.15);
+  transform:translate(-50%,-50%);
+}
+.orbit-item {
+  position:absolute;top:50%;left:50%;
+  width:28px;height:28px;border-radius:50%;margin:-14px;
+  background:var(--bg2);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;
+}
+.orbit-item.o1 { animation:orbit  6s linear infinite; }
+.orbit-item.o2 { animation:orbit2 6s linear infinite; }
+.orbit-item.o3 { animation:orbit3 6s linear infinite; }
+
+/* Warning flicker on OOTB cards */
+@keyframes flicker-border {
+  0%,100%{ border-color:var(--border2) }
+  50%    { border-color:rgba(255,31,31,0.4) }
+}
+.warn-flicker { animation:flicker-border 2.5s ease-in-out infinite; }
+.warn-flicker:nth-child(2) { animation-delay:0.6s }
+.warn-flicker:nth-child(3) { animation-delay:1.2s }
+.warn-flicker:nth-child(4) { animation-delay:1.8s }
+
+/* Stack flow arrow pulse */
+@keyframes arrow-pulse {
+  0%,100%{ opacity:0.4; transform:translateY(0)   }
+  50%    { opacity:1;   transform:translateY(3px)  }
+}
+.stack-arrow { animation:arrow-pulse 1.6s ease-in-out infinite; }
+
+/* Loop spinner */
+@keyframes spin-loop {
+  from { transform:rotate(0deg)   }
+  to   { transform:rotate(360deg) }
+}
+.loop-spinner {
+  width:18px;height:18px;border:2px solid rgba(255,31,31,0.2);
+  border-top-color:var(--red);border-radius:50%;
+  animation:spin-loop 1.2s linear infinite;
+  flex-shrink:0;
+}
+
+/* Tick counter */
+@keyframes count-up {
+  from { opacity:0; transform:translateY(6px) }
+  to   { opacity:1; transform:translateY(0)   }
+}
+
+/* MCP signal packet */
+@keyframes mcp-bounce {
+  0%   { left:10%; top:50%; opacity:0 }
+  20%  { opacity:1 }
+  50%  { left:50%; top:20% }
+  80%  { opacity:1 }
+  100% { left:90%; top:50%; opacity:0 }
+}
+.mcp-packet {
+  position:absolute;width:7px;height:7px;border-radius:50%;
+  background:#7ec8e3;box-shadow:0 0 5px #7ec8e3;
+  animation:mcp-bounce 1.8s ease-in-out infinite;
+}
+
+/* Data stream dots */
+@keyframes stream-dot {
+  0%   { left:-5%; opacity:0 }
+  10%  { opacity:1 }
+  90%  { opacity:1 }
+  100% { left:105%; opacity:0 }
+}
+.stream-dot {
+  position:absolute;height:4px;width:4px;border-radius:50%;
+  background:var(--red);top:50%;transform:translateY(-50%);
+  animation:stream-dot 1.5s linear infinite;
+}
+.stream-dot:nth-child(2){ animation-delay:0.5s;background:#f0a500; }
+.stream-dot:nth-child(3){ animation-delay:1s;  background:#4caf50; }
+
+/* Target crosshair */
+@keyframes crosshair-spin {
+  from { transform:rotate(0deg)   }
+  to   { transform:rotate(360deg) }
+}
+@keyframes crosshair-pulse {
+  0%,100%{ transform:scale(1);   opacity:0.6 }
+  50%    { transform:scale(1.15);opacity:1   }
+}
+.crosshair {
+  width:36px;height:36px;position:relative;flex-shrink:0;
+  animation:crosshair-pulse 1.8s ease-in-out infinite;
+}
+.crosshair svg { width:100%;height:100% }
+
+/* Shield vs broken shield */
+@keyframes shield-shake {
+  0%,100%{ transform:translateX(0)   }
+  20%    { transform:translateX(-3px) }
+  40%    { transform:translateX(3px)  }
+  60%    { transform:translateX(-2px) }
+  80%    { transform:translateX(2px)  }
+}
+.shield-broken { animation:shield-shake 2s ease-in-out infinite 0.5s; }
+
+/* Typewriter on chain steps — applied via JS */
+.chain-main.typed { overflow:hidden }
+
+/* Lock icon */
+@keyframes lock-click {
+  0%,100%{ transform:scale(1)    }
+  50%    { transform:scale(0.88) }
+}
+.lock-icon { animation:lock-click 2s ease-in-out infinite; display:inline-block; }
+
+/* Final slide scan */
+.final-scan-wrap { position:relative;overflow:hidden }
+
+
+/* Cycle pills on title slide */
+.cycle-pill {
+  display:flex;align-items:center;gap:8px;
+  background:rgba(0,0,0,0.4);
+  border:1px solid;border-radius:3px;
+  padding:5px 12px;font-family:var(--mono);
+}
+.cp-dot {
+  width:7px;height:7px;border-radius:50%;
+  animation:pulse-dot 1.2s ease-in-out infinite;
+  flex-shrink:0;
+}
+.cp-label { font-size:10px;color:var(--muted);letter-spacing:1px }
+.cp-status { font-size:10px;color:var(--red);letter-spacing:1px }
+
+
+/* Aegis-X mini logo on every slide */
+.aegis-mini-canvas { display:block; }
+
+</style>
+
+</head>
+<body>
+
+<div id="app">
+
+<!-- ANIMATED BACKGROUND CANVAS -->
+<canvas id="bg-canvas"></canvas>
+
+<div id="deck">
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 00 — SPEAKER INTRO
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s00">
+  <div class="slide-label">Speaker Introduction</div>
+  <div style="display:grid;grid-template-columns:200px 1fr 1fr;gap:24px;flex:1;align-items:start;min-height:0">
+
+    <!-- PHOTO + IDENTITY -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px;height:100%;justify-content:space-between">
+      <div style="width:160px;height:160px;border-radius:50%;border:2px solid var(--red);overflow:hidden;flex-shrink:0;box-shadow:0 0 32px rgba(255,31,31,0.15)">
+        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAF3ASwDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDokUHmrEdJHHUoTB4roZihsjfLisu8O4kEVqSL2qjPFyc1DLRjT5WqplwcVoXUR5rLulIzioKK95PjvUVtKM9ahuUY9TUUZ2nrQM6K1lBXrTppgO9ZFrK2epxViRyRQBO8wYdaqzEE0IfShlLUgIgoZvapkBBx1p8MDHHFXYbU8HFADrFRkGtQfcqK3txjpVjG1cVSEV9oz0qKTG7GKmY4JqtMfnpgKVxyKcpJpgbIxSjilcCO5UgZrPmJxitGYgjFVmVeeaQGROp5yKouDuPBrUu8DOOaokFmqRkCrIXGBxWpaRtgc022hyRxmtK2ix2poAERK4xUMkIB6VqLHxUckGe1AjKkjwOBUUaHdWo8HHSoDFhqAGrHgZFPUcc0rcLTN4ApjIZkGTVN1AzjNXJHz0qpI4zQBEwGPSow4U4FLO3HHFVQxoA0YpOQKs5Ws2HJq4qnHWgTPRQuKeBxSlc0IDjBrZmSGEVWnXParjConSpZSMq4iBFY99HjNdBdYXPFYmoMMGoZRhTg5NV9nzdas3ByxquAS+KRRPbrzxVrb7VDbqw7VZUHNIBY1G7GKspbhuQKSBQWGRWhDHimJjLa346VeihxjIpYFqyBgU0hCbAFyKqXMgSrMz7VrIv5AeM4pgDzAk81VllG7rWZfa1pdpkXOo2sWBzumUf1rnr/AMd+GoMhdSWdh/DCpY1LY0dmsvPBq0kgPWvKh8ULBZCI9MvpUHcYH86ni+LGmDk6RqPvgKcUrhZnp0g3KcVVaMkema4/S/ij4buSRN9rtj0+eMN/I5/Sun0rXdI1NN9jfQ3Cn+42cfUdRQA2aGoVtstV99p5BBzUaglqLAOtYSDWlbw+tQW+AOauxyKB1pgP2Cl8sHqKDMoFNa4XHWmIhnj9qqmPk1ZacFu1Rs645pAVpE4qjcELmrk8q9AaozAPzQNEDSdqrPkt0qysY3c1L9nDc4oGUvK3CozEQOma01hJ4p32f2oAzoo2B6VOpIGKveQMdKheEhqBHpIFNKAc09RxSOeK3ZkiFzgVA71LKRiqkzADNQUireuMGsK93MSRzWhfS5zjpWZNMMkVDLRnuFZsY5p0cQJ6U4hTISKs2yZPQ0gFhi46VJ5VW0gJAxTvKwaAIYlIIGK0rePgVDGgzT7u6gsLOS7uZVihhQu7HoAOtCEXUUKOtZ2v69peh2vn6ldpAvZScs3sF6mvCvG3xi13U55LTw6BpVn2mYBp5B656J9Bz715rPcSXV0Z7u6ub6djkksSW/4EeaOYEj3rXfi7ZK7RaXp7z8f6yRuB+C/4159rHjnU9XmaO61hreF+kcQEY/x/OuLEu3CPasV7KWJ5+mauW88CKd1ukY7AqCf6CkVoXVt9NmYyPcPKfXG4n6D/APVVgKka/KsgX0JVM/h1qi93NkCGyh46F2A/QUglvZVybmFB3VIiSPzoGPnubdAVklZSfQbiPxqjI2nsQRqM4b/rmwxUk91fKoU2wmRehMXWq5aGdd0i7H9BCeKLBcikazBx9vlZfZSP50+3keGdZbC/mSQfdfbtYfiDmoJ4O0c8TZ/ut/Sqyx3COdku1hzw2DU2C56V4Y+Juracq2+rwJfxdpFYLKB9Ojfp9a9H8PeLtJ1dVNtccscAONpB9CO3+ea+bWknLZeXJ/2qctzIhD7zkdCp6UXYWPrPzsKeaFuT6189+EviPq+k3aLfTTX1ieHidssB6qT0PtnFeweG/E+ja/befp1xlhw8Ug2uh9x/UcVSZNjp2uDjrUbXGB1qk0uQearvN2zRcC99qO7rT/tO6skyZPWrELccmi4WJp3z0NMjc9KCM9KULgUDFAJbpVuEEjFQID3FWoB3poRNHGOtLLHgVNCBSzgEUxFNODQwXNTpHmlMPNAHbL0qOSnAikkxitmZopzHrzWdeOQOtaE/IOKyb4NzWbLRmXM3zHNUZQXbgVPOjFiaW3iY9RUlENvAWfGK1bW0ZRkipLO3AYHFascYK9KLBcqKmFxionAzV94wM1UdPmp2EMTgZrxL48fECOZpfCukSK6IwF7OrcEj/lmPXHc/h616F8VtePhzwZeXscgS5kHk2wJx87cZ98DJ/CvlZFMj5LcZ5ZuST6/WpY0SxP8AP5rR+aBz833alkvZ7jIHlRR9sAAfgBUWy2BPmNK/pzTN0AcFYiR6M2c0hljzokUnzZJG/wBn5AP60sV0ifMIoEOeC5LflRBcWwXYLCORifvFioFXraZt4MFvZRMOhWPP86AFttTAUeZccHv5XA/E1d8m2uMSGTzyep34/ADipFgmuf3tzdb8DGFjHA/EUwadaMpk+zMzjjMjnP1wKYxLjTWaP91ZWUfGc7gW/mTWVLb3ELnEYUj+7uFbaW3+iqqiGJgMZ8vJPucmqNxatEwzctk9ywVR+VSwMi5lkbiT5ieueT+tRRKjN82VPUEHpWlcWXyk/aYX4+6JOT+NRxWkJj+WSRX6FSM/qP8AClqBQbczbVGT6ZpGVj8zA4/vCrMlpJE25sFM8MD0/KnmISbi0w3dif4vxHBpDKUec/ewfcVZguWtnDCVkJ7qeRUE8RU4O0/TiodjkgBcCgR6X4X8X63b20Xnakt9Dj5op1G9R2w3f6Gu/sdTW+thMmR/eHoa8E066lsp96EE4wxxmvTPBV3HeLJPaTNuCr5itgMrc9u4xiqEd3C+ea0rT5ulZ2nATFQV2sQcjtkVuWdvsoAkhi9RUjRgdqsxoMUOoqhXIFQbacpxwKViAKYsgzzQhF62YYp8nJqrHINuad53PWmBbiUYqTYKrxTdKlMtMDqFPFNY0dBTHq7kIhnbg1lXeWJFako3CqskIPapZaMkw5OdtSQQc9KvGAGpIYQDRYVxbaIDFW1XFLFGFGaccU7AQTJVd1xzirj81BMvHSkwPlb44+Jf7e8ZTwwyl7Kwzbwj+HcD87D6njPoK4HfirmtFxq96JTucXMm73O85qokasPmJrNljWYn0pyIzNtUbmq18hiSKKIbjzwMk475qbTbN7gzSKSIYVzJJ2HtUuVi1Ft6E9toF7JYi8kZIoT93J+ZvoKv6P4V1i8ffb20u0fxZxXa+C7ca15KJFuWIjC44Hpn8AK9n0bQ4LSFUMakjt6V5uLx/spcsT18HlqqR55nhll4G8TzKEGAo7Fsmrk3w/8AEkcRKmMn0duP5V9D2emgYJVVHYCry6crgjZkVwf2jXex6KyzDpao+T7nw3rNi5+02RkHoi7lqtOs/lBLjS7nA6YGP5CvrdtDtmPzRAfhUM3h+1CY+zRH0yoreOZVeqMJ5VR6Nnx9JYTv/q7K6XnjI5H6UHSbxE3JLMo7rIo4/SvqnUPDNtOhDQowP8Kgc1xeteGrtXaKyso416ZaTP6Y/rWkMxbeqsZSyqCV0z58uLC5U55rPlhmiPKY/DFeuax4S1IL5YjOfVUP865W+8HamjEtC2O3NdUcXTf2jingKq2iziCJGOOadHEScsW/Cusj8I3rPh4Hx9a1YvB/k25kli6D+GnLF011Mlgqr6HEC2YR79g2r1Pf8a2vDd0LG489GAZV+ZGPUe1RXyPp1ww27o8cgjgisu7my67PlwMriumL5lc5pR5XY9u8O6k4t4LhzvtpD8rDlkbsDj8vxr0SzjjmjDIQeAeD2PSvCfhfrEk0LaZLzGW8sMSBwRkfjwcfRa9u8MnY8kDNuAJ5xj5gcEflg/ia0RkzR8rbUE4C1dnIFU7rBSmIz7qTA4qsspzSXpYA8VXjfjOKCjQSbjGaRpQDVLzR60jyZPWgRpRz4wc1Ibo1kLcc7c1J5tAHpzLTDGTU2Qe1BHetrGZX8uo2j9qtAUyQUJBcrbfalVMHpT+9OXrQwHAYHNJjNObpSCpAjYCoZvlUt6DNWdopkifKeKGO58WfEa3jtPHWt20SlVS9kwuOmTn+tYoxxgH/ABrtvj7bC2+KWrlQcSCKT6kxrn9RXFxhhtHU4zWUjWJb0mwudRult0BSMkB2Xrz2Hua29dltraKLQdO2nBAmZTkM4PTPcDufX6Vl6ZBcyOFguTDk8Hn+leh/D3wVateC9vZTcSpjjACD2/8ArVx4irGmrvoehhKEqmkVv1O5+Dmjix0kXUsZVpfmUEc4xhSfwGfxr062jUYbAJPWsDSUEShVUBcACt6ycM2BXzkpe0k5M+mjFQSiuhtWIBCg8jpXQxQQAKF2kkduorlbeQdASMVsWLk9CeBXTRSRFRtmuLWLOeKlS1gwQVU/UVVjlYc5NTK2RwQDW7SRhqwn06FpMpGiMeuBioZtJtNv+qRmxndV2NCeWYim3T/uinH1rNpFWZzN/pNiy5aJciua1PSYCxIiTaPauxvFJ3d81iXxKKeBXLOKNk9DiLvToQ5HlL+VY+r2ii3ZVAGR0rqLthvIJySe1Y96oYfN+VYLRhI8c8YWMeWKfKwyGHUYPWvN7gGOUx/3TxXrHxEtJLeV54t20jn0NeVXZDzHsDzX0+Dnz00z5fGw5KrOj+HEU8vi3T4LWQkSSeZIFXPlhGBJ568D9RX0xpto0EO/bhiBjPXrkkn3Nch8HfDdlp3hfT9Sa1jF5cQBy5UbgCc9ff8Aliu+kb5feu5bHCyvO/OKrysNpyalkyM5HNU5+QeaAKN42QRWc78Yq1cZDkVSdeeKBjSxHSmiRs801uDzSMNvPrSAcGO7rVlW+WqSk7s1aRCy5zRcD19hg07jbRkGgVuZDSOKicVOcVBIDmqExFWnrHRHUoPFDAiZaYVNSsaYWFTYLiouaa64Bp6nFNd/lNDQHzN+1HbInjPT51C7pbIBgOvDnk/hj8q8nHCnHXIFe0ftOWTtfWGoK6uAzpIo5YZC4z6DjGK8XUll2juQfxrF7m6TSOk8GWc+oX6RRD0JPoPSvcPDOnLZQKu7JA78CvMPhHs+1yJtxgD5vU55/wAK9fXhAVOBivAzGUnU5eh9NlkYqlzdWa1u5UA57Vp6fIzEdhXORyHyXZW+ZBwPWpbnxDFZxkxxliONqDLH/D6158YO9kd8pJI7yBQwGOWPXArY022kYA4xXkcfxRtdOH73TpnUDnoSD9M81cs/jvpMY/eaddReg4NehDDVLXsccsXTTtc9qTT22gluacIGj4P54rzTR/jJoep4VJLiM8D54+P0NdRaeKILgBop1cHuDWdSShozSD59UzrbaJ8MvH0pz2xYc4BPt+NZFtrKhC+ASe+elUb7X3TlpGxnio9rCxfJI1ryzUJnI+prmdVth8x3H8D0rnfEvxDg07fuilmZRnjoK8w1z4va1deZFp+lMhP3HaMt+macaDrbGVSvGjueharEqk8MD3wKwbwkHrkDvXnh1b4g6pILpluEiH8Pl7Afw61eh1bW4ptl2qtjG4YNRPBuG0kyI4rn6NGl4msYtTsZoGGWdMKfQ18/XsbRXk0cgwyOyt9Qea+iVbzFVwOG54rwrxJb7/FGoRoBzdOAB9a78suuZHm5lZ8rPpLwCzx+CtGWb/WCyizk5P3Rj9MVtq5Yg1znhbEehWcIcnyYVj568ACt2B+MV7Cd1oeO007MnkG4ciqcyY5q4GBpkyBlpiMS6jLE4qk0Xet1oevFU57cCgZjyRc1C4OMGtCeH5uKgeEnoKQykoI4zVpGbaKQ2zA5IxUogOOtID1hHwOakDDFQAilziuhGRKWqMnNNLZNHeqESIKk5ApiHFOYjFIZG3NNNKTSGgQA1X1CYwWc0q/eVCR9cVMTiqmpnNq2MdRnP1FZVHyxbRrSipTSfc8ov9K1DUZpY74x3cMrt+5ZOT1Gd3XNeHeIdFm0fVri2kjdQjkoGHOM8Zr6ujhVtVztAESkv9Sx/pXl/wAaYrbU7mO8itHWeBQsjgfK6g/L+PUV4GCxDjV5JPc+ozHCqpR5orY5D4Txg3cpXOdgyfxr1y25i2nPpXnXwyiR55njXZHgDH0616hZW/mBe3rUY9/vWLL9KKMnUfMWIqrFFPBI71mw6holizLfXMKEDJGct9a6/UtC+0QMFzk9+mK4eLwc1vrsd9dxJdpHIH8t1+UkHuO/41hSUbXkzqqOW0UbFp4r8Iu62R0+4u5ZBlEjs2kLj1AA5FQy3/ga5u5LVNIMVwpIkjeHY6n3VsEfSrXjTSLrXtei1zRNROiagkHkk+c0YUbcZVk55BIIrd+GumQaHb6jL4klj8R3t6gRzK25NvU5ZwSxz3ruSpOGjZ5spV1LWKOfttK0eUGWwghx3VRgj8O1bmhoYbhTnZ2xRH4bWPVRd6dF5Fq33oHlLhR/snAIHsc1sT2KQhdnUAHpzXBXg11PRoSUuh1FjHNJbZVSwx1Brm/Et6toCGyo+tdFosx+xFEb6nrXGeMk867jVu/41g0rI31u7nPXU8TI01wURDyS3eqVhr+j/aDZ2dlcX1yQSkFvAXkfA5IUAnA9cVvTaCmpLA3ylIyDIpJAf8R26+nWoPiJ4atNaS2l06ODQri2jMQe03lWT3Awc/jz3rvw9Km7Ob0ODEVKi0gtTOj8UNeXs+lWvhrWDe2wJnga2KvEBwcjGeD7Vzl14isbu48lQY5MkFSOh9D3B9jXU/DuGPwf9qvJLyTUr+RPJV9pConU/e5JNYeraNDrfiKXVmh8mWRgXKjGe1FRUFLS5jB4jl96xc0zL268V5nFpMl18SLyBOGW4eXpn6fzFexw2AtoFUcDFcxotkf+E91qZI8stvHKp9BkZH6VGHrOKm12CrTU6kE+5teEIHtLJ7SWWSR0cnMhya6SA4qgoVrtpQApky7D3J4H5Yq7CPSvZwbbops8nH8vt5cu3/ALcbU7OaYobHNPCnFdRxkMtVZOQc1YlyDzVWRSTTEVJQCajCkN0qw6EHpTlTjmkMqSrkU5ANop8iAnrSiLAxmgD0QUjsAKZuFQzPgVqZkoIzUgqlHLz1qUSj1p3CxcVhikZqreaO1J5lK47FgsMUwtUJlqNpvehsLE7PVLU5wlnKT/AHTSTXIHesrVrkNAy9c9KyqP3WaU17yNSwZH0O+uuN8s3PqABgVxXxbgtLDwFI4Kg3e394Rkls54+ldTbwzOq29sDiVR5npj1rzr41Wd3baLDCbnzrIS5jUnJU9/wr5nDr9+rn2GIl/s8rdjF+G6otjLKOAz4Bz1xXpWkSoOmSc9RXn3guJI9JjjXADEn8R/+qut0SY+a2TnbV4rWpJmOFVqUUdzYxmfHb2NT/2Mvl4CgKOmeeKi0d42iVg31xXVWYWRQCMdq56e9mdTRzaaLEvPIH+6KeNPjyAELH3rpriLZkBSffFU5gFHXFdS02MuVGY8S28R3FRngViyy7p5EA+RThWP8XvV/V7gKcdT2FZkKSPcKZlZVY4Brmq3kzaFkb/h8L5bAjnH51geMLUJd+Zt4PQ12GjWWUVY+eKq+JdPDRFJRhh0rKcWomrszjNGuljfaxzk4Iq/eWomUOjZB6AcVgiC5S6kljjzHG20+5re0ieOdcgkY6iiDkkYtJsoPpbsDu3AfTNT2+jKgLPnp6V0kMYKjOBVe/8AkBwDkDtTlcXKjk9Xi8sEgcCuK0O6WH4kT5ICS6Wwce4YYruNbl3RMOmM/jXn+kWtxcfECW5iA8qC02uW6ZZuB/P8q0oPSV+xx1lacbdzrbVSWZieScfkKvxowwapRq0dw+49TxitCGTPBr6LC/wY+h8/in++l6k6McAYqbIC1WIxzmmtOQMV0HOLOQarkZ6UO+40+IccUxEDrzTCSOMVPIMGozikwK7H5uaUuM0kuSarsTmkB37mqlwxz7VZnNULiTFatiSGCQg9amjlyck1RklXHFQG529DU3HY2fNA70jXArIFyT3pDc+9K4WNZpsr1qtNOcdap/agR1qtNPu6UXCwt3dFT96qb3SvIoYkLkZqvdsxaqbMVyM5qHqrFLR3PQbXzXt0e2w/HHFcZ8RdM89Ior2T97IdwA/gApmna3qVipS3lXHYOM4qhq8txdTNfXc5nuHIXnhVX0A/rXiLB1acuZ7I+k+v0KsVFbvoVILGKzgEcC4XOT81aujEKecAms5W4KNj5utaFkuSVXHA5xWU1dXN4u2h1mmXDRSIARtHYdxXX6VelFy2T9Otee2M4wCxPGOfauksLwhFK9h1rjT5WdW6OykvYmjGCPxrJvrsMSiDk96p/ad4C+tIk0Jk2eaMjriuxNyWhjdJ6mbqiyQzRXTfPEud4xzUOq+MfCtvarBPfQpPjKqOW/Ic1tyLFKhG0EduOtYtxo2mtI8v2SEzd2MYyD9aapczB1lFWRN4T8bWE5RUuclD1wV/MHmrnj3xjbWuntcsVaQrtVVGS34DrXKav4Wkn2z20vkyL0Y5qpb+ErpwJLq7Fw68FjztFKVF7X0J9tdXtqV/D3jnTbizkt0iuGunYlw0RAya2tFW4B+0AfKTuNVLbRIrEgFQ4HO4L1PpWrHKbUbAhCkZxjgVm6KvoSq76m+lyuxSTyap6ldrt3KRmsKfVY1k2GQAN29DUU92rKQWzisqsWjanNSRV1qcFOMAZ9Kw/C4i8/UZnnWNvMUAZ5IA/wDr1Nqs+Q3Uk1L4VsoPsQunijaWR2YOVBIHQfyrfCYZ1k43scGKxCoyUmrmnEu/DEHnp9KsKuDmnBTTwPUV9BSpqnBRXQ+fqVHUk5PqIzYFV3GeaklIqJmGK0IIyQDUsbACqcrYagTYXk0CLTyCo5GUjAOKrGcY61GZdxoAdIWUnJzUDyc09345qBsE0hnoU54NZtxu5xirk8nGM1nyvz1q2JFO5JxxWfJIQeauXbYFZNzJjNSyi0s2e9MachsZqkkjE05umTSuBcE4weaYkylsk1VVhnrSyYAyOtFxFiVlaqkqbiaRZCaeOeaQyukRD8U/UExZM2Pu4NSZUNyalCLLGUbBUjGDSlHmTRUJuElJdDJcN5IeMsV68dals7h0mUNgjA3DP+earRSm3uZLKVstGcgg9QeRUd+XVhLCwHGcnr9K8SUGm4s+mjNSipI6+05j3bs5HGOMVrWEwI4OOMdK43QNZSSJUkIDAnnsf/r1vQXQA+V8jOelcc4NM6IyubF3PIsLY4xxVHT9R3ShMgsvXmrEM0E0JR2BPucVj6jpcjyMYppF3dNj4/DNb0XdWvYxrLW7R3NpqWmQx/6TcRo3ucE0xdY0pnJtkLc/QH864e08M6aHaaZLkynkCS4dsn65rc0rT9Kj2rc2jbc9dzH+tdEYp9QSstUbU2qoSN0ELLnozdap3WrIJFEUEEKjodtakei+GjGXH2jPsTj+dNXS9AtoTM1ozMehJyf1zWjpIak3sjnL7XnjjO3ZIR14rnLjxXM939kbTrtgVz5kcRIA9/Sun1KUu5jtIkgj5yxwOKx5IoVRgTkHhm9fauWTgnYc4vuZ1ik97K8jghP4cjkfWrd1+5TBPI9qsx3kdrHtYKq7ehrndU1VWLYYEdu1Z1FzOyJi+VXZBfStcyLHED5kj7IxnueK7GzgS3gjhQfLGoUfhWD4Ls2uidWlQqgykA9f7zf0/OumAGa9jBUfZwu+p4OOre0nZdB6Y7UyUgCkJwOKrzucV2nERXD4qjJcYOAaddyFVPeseWVgxJBpDNF5cjOaryTY4zVJrgkd6fEd5yaLiHmRmPWnxy44JpRECOtVLkMnOaALby8darPcDd1quspPFNYEnNID0maQEdapStz1qtJc56Gq8twRV3AmumBXNY94RmpLq74xms959x5NSxksB5qY5YdaghALctmrK4A60hEflkDINRu20c81LISRgVCyccmgZXMpXkilF2AKZKOelN8oMKAJBMXO6sbxv4kl0bTFis2UXs4OwkZ2KP4sfoP/AK1aF9cQ6bYvdTn5UHCjqx7AfWvK9bu57+/ku7kgySHoOijsB7CmtQOq0qaS8sIb1Lp5piqlpHOSW/i3fjWrFqIYGKUbXAwyk4/yK4DQdUfSbolgWtpT+8GPun+8P616Pa6fZa1aJJGwPAMckZ5H+IrOrh41dep1UMTKlp0KbMUkWSFmOOTgdPrWpBqk6DBYLjqKy721vdJwZkMsGeJUHT6jt9elOilguUDEgn2rgq0bO0kerSrqSvFm9b66SxHmYIHTFbmk6yLhCh2gjGSa4G6tAcmAk8ZxnpSaZq0tpMI7jPynAJ71j7BLVGjrt6M9XE7lACMio5EuCMwSsp9OorJ8P6lHPGN+GJ7jvXVWM9iSM4DdMH1rD2dzf2tjn7m11xo98czr67SRkVWgt9VkYk/aVOf42bP8675J7Q/MXGB2yDVW/u4ACVZPardkrCu3rc5b7NcIMyyOT/d7VDcBgp3DpzjFauqapbxQnDoM9zXBeLfE0MFu4U/e9G5+nFRGk29CKlZRWpV8Qay6zOCXXHToeKh8JaRd+IrozXG6LTo2w7DgyH+4v9T2+tY/hnR7rxDeGa43R2an94+e39xfU+/avX7BILa1it4IlhhjUKiKOFFenQwy3Z49fFyeiLcSJFCsUaqiIoVVUcADoBSkADNQtMOmelRPP713Hnj5pAM1SmnHSllct3qlN14PNIZHdSBhis24Oc1ZmLZqlO3zc0hkOCTUsLFD1qLcuetLuzQBpW7ZUmoLoFsgUyF2VcZqQZamSVViI7UFTn7tWtoDc1IFTHIpDL8JYg7s1HcFscA4rTW1IHIpjQAmqsM5+WKR+RUaWzs3NdAbUAGojbEdBSsBmxW7KSTViOI555q55OBjFKseOKBEKw56imTQhRwKvIlQ3YKigDHnUKeec0yFlB5GB71Dq17bWmXuJljU9ATyfoK5LWPEaXKSWdpvQMMM54LDuB6UDK3ivVjqV9sjb/RoSRHj+I92/wA9q5yeIt6VckZQOKhLDtT2GZ8kZ71seENfn0C9Xfl7Nm+df7vuKqvHvGRULwnBGBincD36ySz1exjuLdlZXUEEdDWLrPhCMlpLQm1l6hoxkH6r/hXE/C7xQ2kaguk3smLWVv3LsfuMf4foa9wieOeMMMNkelaWjUWo4ycXdHkN3Z6rp67p7czIOrwAn9OtZN7Jb3kXcSDoc8ivbLnT4mG4KFbpkCsnUfD+mXXF/YQzekqjBH4jkVzywqTvE6Vi5WtLU8XttZ1DSHKgmRD1NbcXjhNgPnEMB0712OofDTTLqMtY391bk9Fch1/WuH8R/DPxPYq0lpDa6igGcJmOT8jwfwNZywy3aGsTJbM0B8QVAw85cegGPwqrdfEPLHyvNx+lcDPb30MzQT2E0MqnBR4iCPwNTW+n305AW2kH1XFc7o0k9jZYmtJWTN7UPGeoXnyrlB61lyyXVzBPdyN8sSliewwOlaWmeG5Cwku22qP4R1p/iryYNHNlAoUSkJgfmalVI8yhBBKlNxc6jI/h14ovNOuNm5poZDlo3OAT/RvQ969psL+C+tFnt2JB6qeCp9CK+c9FErSssSsZN211U4z7/p+deoeE7qcbWjdhKo2kHo4HqK9C1jzWd5LOyj371Gsxc1DbXKXUfI2OB8yHqKAdpNFwLQY4qGRDknNNSXJxU4KkUCKTxkA5rLvQQSa3pVyDWVexZB65oAxnJLZBp8Zbp1p7xYNAjyOaQyxGSV561IrsveqaEp8opxkJpgXfM9TQZOarJ83JNOY4PWkI9EMIK8Cq32b5q1QgxTDGM5rVolMzja8dKQ24A5FaZXArP1W8tLG2a4u7iK3iH8Ttgf8A16Vh3KU0eDwKjWMscmuU1v4gWce6PTLd7pu0knyJ+XU/pXFar4g1jUyRc3sgjP8AyyjOxPyHX8aTGkemat4h0XSgVnvEaUf8sovnf8h0/GuI17x1d3OY9OtxbJ/fkwzn8Og/WuTbaoJJxVK4u0XheTSHYnvLuWeVpbiZpHPVmOTWdcXHOVOCDwahuJy/GP1qIMcfdBp2GasUwmiDjg9CPQ0FsGsxXniyYyBnqCMg05b45/fRGP8A2hyP/rUguaccnOKldhiqUbhlDqQQe4NSNP8ALjGTQBWvyoByOK9c+EfjE31oukag4F3CvyMT/rlHf6jvj615DL8z5c8+lFvK8MyTwyNFLGwaN16qR0Iqo6CPrK1cSqMEEEdM5zUrwqD0ArgPhh41t/EFmtldssOpxj5k4AlA/iUfzHb6V6BG/mAAn5e1bKVwK/2VVyyMB6D1pY5hH+7kA9gelXTGMbcfKKo3sWApxwOQRzSYyDUNN0vVUEV5Zwy8YUlckfQ9RXEeI9F0rS72GysroveXG5obXbvZlAznI6Dg4J6119xdmK2aRmwqgksDg4AzXlGoXcUd3e+NE1+SNZlA2yIZFyQAipjkH2+tc9ajCp8SNaVedJ+6yHU55kuHtRCxmXh0A5Q+h9D7V594wu7iHXYIp/ljVOR6Fv8A9Ve5aD4j0bxjbrG4W3uWV1EjgCRWUDrjlh65yQO1eKfEnTbi28QzR3iFJCdhx04GQR7EciuKlQdGr5dzsr4hV6Pn1Q3w1HnV3mC9FyRmvQ/DNvNLI1w+EdsbSUzt9MDI4/GuB8FbJHKP/rVIz716TY3Rit/I+UE8Iwr0I6nnM6G0haVVYsFlHdVI/n1FLM0ijDgA+o6GjSRDH5MbFWboGJOV/L+oNad4lsI5BeSRW+wB2aRtowf4snAx7/8A16coiMmJznrV2BuPWsyxutNvJJBp2qWN8E+95E6uVHuAc1fiXA4NZiJ5W+SqFwcirZy3B6VXuFwOBTEZ8sYJyBTMBRzUz59azrmRlbGaQxZyuSQaiVxVeadip5qBJjnk0hmojYNPL81Rjnz3qQy0CZ7IKr6hd2ljbNc3txFbwr1eRgorhvFPxHtLMva6IiXkw4M7f6pT7d2/QfWvNdW1PUNXuftOpXclzJ23H5V9lHQfhWrkSonoXiT4l28YaDQ7fzm6faJhhB9F6n8cV5zqmo3+qXJudQuZbiXsWPC+wHQD6VCFHaoLm4jhHzHn0qdy7AxxyaqXN2qZC/M1U7m8eZsZKr6VBnjrQBLLPJLnJ49BVVzz1qXPp0pqhS2CMfWgCHgtTl47ZqZol6io/KYfSmA5Rk+1IAoGD/OnKDt5qJWMUm5l3L3HpSAfHERJujJQHqB0P4VIwKg/yq3EEdAyEEGmyx8HigZTH3jnpimcgAHpip3jIP4VHjH3gT6UwJ7C9nsrqO6tZGhnicPG69QRX0B8NfGVv4isDHJiO/gA8+LPBH99fY+navncgNjnp1q7o+pXelahDf2MhiuIWyrYzn2I7g+lNMD6zjkBIHQClmTzFJAA4rmfAPimy8UaV9rhxFcxALcwZ5jbt9Qexrdu7pLWJ5ZpBGqqWZiRwB3rVO6A474mXb2WizQW203M2IwvcDI3HHpXISeFrXVPDM2mzs8YaYzqyHGGAwrD2G7pVjX7nUdS1ca1ZLvZP3ZtJeY5IwT8v+y/Oc10ehvA1qt5piy3EL5V7Z3KsjDOY2XoGxnGevHPOaz3YjC0bwReWWrxS3N3bS+VvmMyhlZ25wDknoT19CetZXxj0gajo1nfIWa4C7C7DDYxuXI9juH0xXpmmpZa1pwuNLu5MoSskMw+dCfvI44P69uprM8R6DqFxpTpcRRBYDvysmVIC+h5H61niE1TbW6NsPZ1EpbM+btGvHt79Zh8kgOHU8c5xXp8Eq3NnHPGcOMblrlfE+gxW2qwzqNiXD+WTjgOfukj0JwDVvQJbu3iWK5hIXywQynOQe49cD+VZ0KyqRUkOvRdKbgz0jTI38mK5bGGO3g8gZ6kdh71oeLbSx8R6G+gXsXnwgfuXJ/1cvZl9/XtjOayNDgmTYxcNHtySe3bkDoff8ORxW7pbPPdxsYvLeEhSAwIPYkex9O36V07mDPMrQWXg3RJDZwR/wBozN5cTN82AD87e4zkCr+kfEGIAJqNkyH/AJ6QHI/75PP61xGt6nNqWrXFzcYDNIwVR0VQTgCqnXvWLYHt2l6zp+pxl7G6SXHVRwy/UHmpLuU4rw+OSSKQPG7Iw6MpwR+NdRofjG6ttsOqFrmDp5v/AC0T6/3h+tFxWO9JLVRvIskmrVlcW91bpcW8qyxOMqynINLOu9TgUAc/cg5IzUKir96mHIOMiqu3BpDHRjFWVII6VAgq0qMRxQB5wZrpzjeEH+yOaXy5G+9LIf8AgRpy8ClBNMYzyD/ef/vo0x7bqdzZ+tWlyadtNMDKeF196iZCfUH3rZMYPXmongB7Ci4jNVGGM010Jq80RTO3p3FR7Vf7v5elMZWRipHpU7YKZFN8nBzUsMfUHpQBCqk1Gwycd60REAQRVWeEhtwoArRNJatuXlD95f61oo6ToHQ5BqqQpGO9RJ5ls+9ASv8AEv8AhQBomMAdKY0QOOKlt5EmjDqcipwoPNFwMqWEqMj1qIHb+da00IZelZ9xEFY9cUwLnhjXb7w/rkOp2L7WTh0P3ZUzyp9j+le/2GrWfjfSo5bdyLQqGljJ+YP/AHD/ALvX3yK+bThlJ9K6HwL4qvPC2qrPADJbOR9ogzw49R6MB0piPbU0ZNNZx/rYJD8jn16bW/2qqTW72zjUdM2JMoxIjHCzKDgK3oRzhu30rp7S7tdQ0+PULeRZ7O5QM2P4h2P1H8vpVK50qS0YyJIXt3BZTnJTPY+o9/zoQzLwl8/9taO5tdQXi4hY8njlWH48H34qyniePUNEvbS5UQXgtyDG3cgZ4qibdre6+028gjlX5QHHylfQn0469s+lVdXRbsm9sohFeW74lhfG73Q+uR0PToa0tzKzBOzTOB8bFLmz+zr96WRVTHUHPUV1fg63gudNuLee1jm2sZFjYdcfdC+hxxx3rktOTzdducs7xpbloGx0G7DZ/wBodPx966vw+zQEOG2ng56ZrhwdB0o2Z2Y7ERrVE47HU29lp5hEkcgihwNrMmUGD0LD7uPQ/wD1qfHJFY30s06ho5Apjw4yzY4UEdSeMevStHSYrC8hO9SkrDlkbbk+vFUfHlz/AMIp4I1C6ikj81Y/Jt8KBudztGQO4yTkelduyOK58z3Rc3UjMrIxdiykYKnJyD7ipon/ADqHBJ5JY9yepp6DBzXOBZ4NGKYOmRT1NAzU8Na3caHd8ZktJD+9i/qPQ/zr0iC6hu7dLi3cPFIu5WHevJioZcVt+DtYaxnNjM48iRuM/wADev0NMVjsLxSWz3qFEDfWnTSHdwaWAjdk0gHxQ5PtVjBHGKntlRjwKsGJc0CPJsZWlRaRRgU5eDVFkqcVJyelRofpUo5FACEU3Ap7Uw0AMdQTiq0sWDuX7wq3THTJGDTQiuh38YAIp5TB6Urw/MGXinoRIpUj5h1pMY0+lNZaecikbnoKQFV4hnOKiYfKVPWrp+lMeNWFO4jPR3tpd8eSP4l9a1raZJkDoeDVbyeMEfjUflSQP5sP/Al9aGBp8/hUFxAso4ODToJ1mjDKfqPSnFqAMuW2kXNQEH5fXvW2fmGCKzri3ZHLD7tNMR2Hwu8Ztok50rUZW/syZuG/54Me/wDu+v517jo19+5NvP8AOI+Vdecqeh+mK+XI0yfxr1j4UeJ3XytFvJP3kQP2Vz1dOpiP06r+I9Kew0ejappiBBPZhQudwX+E/Q/wn9PpVCbTjOBcRW4S8hTDKw5dM52n6cgH3HatlSwAuLRiyOMtGeVYe3oamgj+b7RbhvL5yrcbT3Ht9KpSA8o1mwisvFUd3EjJbaidrKQfkl7/AJ8fka3IdBkdQ8E+xsDaPX2ra8b6PJdRWrxoxWW6ikCjHyOHAJ/InP1BrRvrJGQtEu0ICApIUqBVaXJaObsr+40y58rUbZ4Nucv/AA49Qa8y+Lnjb+3tWXRbISJp1oQ/z9ZZCPvfQdB+JrvtYgl1+JITdzC1U7kUn73ufb2rzz4keGZLe3TUoIiGg4lx3T1/D/GolK+iBI49VzUqLmnQIGjDAZqdUrIoj2HFIBVjbUbja3SmAqHFRTjawk/A/SpU5pzqCp4oA6jQr5ryzAdsyxfK/uOxrViLAcnpXEeHbv7HqcYkOI2Plv8A7p6H8K9BeDYpIpCJ7ObHOastcjPWsYM0dIZzQI4YGlJNMFLmqLHxklwAOtWIycYJquo5zUgI70ATMaYfrUZelXLUAKM08ClUYpwFADdo71BKhVhInUdvWrIFI4yOKBESbZE3DoaYy47UL+5lGfuP+hqd0yKQytSjFOZcGmGmA8e1LtyOQKRelOzQBWlheN/Og4fuOzVLbyJMMjgjhgeoNSA81XuImV/Oi4cfk3saBFqkYAjB6VFBMsoJHBHVT2qXqMigZXeABspU9u0kUiSxO0ciMGVlOCpHIIo69acCKLiPZ/BniP8AtLT4pyQgY7J1U/6ubv8A8BbqPqfSuueSWL/SocyHAEkQP319R/tD9a8D8H61/Y2qFpS32S4Hl3AHYdmHuD+hNe0aPdq9uImkG4AFXHRh1DZ9DQmBo6s11faJcnTgrS7RLGRjnb6Z784rPvdQGoeCIr3yWikvYkVWI+Ybuo/AbhWgjRwIxxsjckSY/gY9/oc/nWRpfmRaHZ6fccva3EsMmf7y9/xBzWj2Ec/YWT2UgYTrvXkx9MjvxWjdQxX1s0Dqjo6EFCByD1rqYtKsb2BlmhDsOhxgj3FYWp6JdWkfm2zNLEOQf4gewP8AjUAeCatpUuh61c6ZMrbUbMTH+JD0/wAPwqECu6+JFibyw+3LGyXVif3gx96M9T+B5/OuFRsqDSaGgHB5pJVyvHXqKcRnFOxkYpIZVQ04kgU1vklK9jzSnpSEVrjhg34GvRPC+orqWkIzNmaL93J9QOD+IrzqTkMDWj4O1I2WqrG7Yin/AHb+x7H8/wCdAmd1MvzkVC0fNX9metRPGd1Ajz3jFOXNRgVIKosdTu1ItPAoAaq55NTrgDgU0Cl6UAOHXOacDzTQc0oAFADsmjHFGRTSxoAbIishUjNFs5/1T/eHf1FIWycVFcZXDp95eRQBYdeKhZafDOkqA9iKHHegCMUopueaeozQAooxxigLzSkUAVbiJlbzofvdx2YVJbzJJHkZ9wexqXHaqlxE0TmeIf76jv8A/XoEWaM1DHIHQMhyD0p5JxQMfnNd78MddZT/AGVO+54gXt8n78f8cf4feH/AhXn26pbS5mtrmK6tpDHPC4eNvRh0oEfRdgTIzwSHepXHPRlPSs6zWWPVb2xuGUusiXMb/wDPWJ12BvqCgU/8BPeqvhfWIr7S7bVLb5Y85aMf8syDh4/wPI9sVs3kSyapYTIQrozwE+scgzj8HWM/hVrVCZtWo2oNrnkZpwY+a2Dkd/TFRWfmPGdowR0BohDR3LiRgBIvHHcdakDmvG3h9J45L21iYybSskY6SKRyMV4BdQfYr+4sjkhG+QnqV7V9WkbgUPIIrw743eHjp2qQavBGBDKdjkDpnp+v86GBwXbjrSrTT0zSrg96kZDdodu8fw81AHyKvsARj1rOA2sV9DQwIpTzVYHEvBx3FWZxiqoPz5pCPWNFvFvdIt7rqzJ8/sw4P606R23Vzfw9vN0dzYMemJU/k39K6dostndQI85B4p60wCpFFUWOU81KpGajAp4HNAD1NOPNNHpTgaAAU/GelMPtQrHPNADwppWXjmgGhqAIsVBO2Ksv0qncZ7UAVIpfKuWTPyt8w/rWrE4dKwL35HR8nIatGxlyoyaALbrzSqaCcijvQBItFNBpaACgjIwadgYpBigDPlU2spcD90x+Yf3T61MWGODkVPIgdSp6Gs9c28nkufkP3D6e1IRYzSg5qItzxQGpjOy+GWvJpesnT7pwtlfkIxbpHL0Vvx+6fqPSvV55StrIgykkPzLn1U5H8q+dyAwr2fwFrX/CQeHRJLIWv7HEV2D1kT+GT/H8fSnF2ZJ6LaMokVyuBIM/LyMGluohMnynZIpBVh2Pb/CsXwtefadPfTpWUXFk/ksM8snVG/EfqDW7a4Yhuc52sDTGR28275HwsiEhwP5/lWf4z0aPxB4YubCRRuMZ2HHIPb9RWrqEDfJcwJ8wOGUdxin2UqPGSO4B/wA/rQB8oBJI3aGUbZI2KOD2I4NJ0PNdZ8W9JGkeObry1xBeDzo8DjPRh+f865Rxg5qGhCgVQnXF0wzgHmr45FUdQXa6P9QaBkEzDBqnGW27nUqSxGD/ADq2c9arTcD8aQjS8P339n6pBdZO1Ww49VPB/SvXFgQqCCCDyD614lDzXq3g/UGufD1qXbLxr5TH12nA/TFAmefqakWoxgVIgqiyYUtIozTsUALx3p2aYB604DnrQAucUmec0vehhxQA5evNPxmq5Zl9xUiygigAfANVpsYNWHAIzmqk5wpFAGZqq/uHYHpVix4UfSquotmB19qsWDZiQ+woEaIPHWl5qINUiNQMlA96dimqwxTs5FAC0YpAaXPpQAuKr3UKyoVP/wCqrHamnmgRlqx3GNxh0647j1p3v2qS/hJAkj++vI9/aoYpBLGGXof0NICRSa2fBevv4b8RQaljdbn91dJ1DxHrx3x1/P1rEDc0p5FFwPenc6P4z0y6tpUex1LbbMxbhkfJjbPqG4rt3R4rpVHR15OfTkmvGvBNzJ4o+Hd/4ZDsNW0xfPsHB+YgHcuD6gjH4D1r0S6vf+Et+Gi6pZxs921uLhI1O1vtEf34/wAWDLj3FVcDrYmElvhX3dwQeKzvntZNwBZHJYjHQ55H45rivgdq2oXy3sV7bXtvAu1lE0BiCuSdwXPPQDPvmvRry3SRJIiBk5wfQ9j/AJ9aad0B5N8brBrzS0vkXL2spYN6oQdw/QGvJAdyV774lhW60m70+4XDMjKfYkY4/Gvn22fIKkEFeCPSkxIkQ81BqI/dbvQ1OeDmo7wbrZx7VIyhkEVXmGadG/GcUyXL59KQhgkAOBWvpOt3mn2xghI2ly3P0H+FZUcSjpUwU4oA0lFSJUa1ItUUSKafnimLgilFADqctNGcZpwoAd3oIFKMYzTSaAAjPFRNG4OQalNMaVFON1AEZdlHzCqtzMuOeKsXV3GiEkg4Fc/K899KSh8qPtxyaQhb2UFH5HSrmnH9wn0FY11ZzQyKWdmQ9617D5UC+goA0BT161GBmnimBIG96kB44NQqMVIpoGPBpwzTFpymgB/amseKXNNJ4oAjblTmsq4za3PmAfun++PQ+tabvk+lVrlVkQqeQaQiInvTkOap2smxjbSdR9w+o9KnjbBxQB0PgnWX0HxPZ6iGIQNslx3Q8H+hr2bSZYfD3jGbToyU0nxETeWHdI7nH76Iem4AMB7Gvn8fMpzXsHhGVvG3w6uNIE3larpzLJaSg4aOZBlGB9+h+ppoR6lZSyP8srM3l8Jnrt7itAkmJjnkVxXgXV5dW8O2WqTBVuCpS6jX+CVThwR255x712KOPL+XBDdOapDOe8YWcktjLdwoFmjTc4A+8o5z+BFfOfiCKK18SXkMLZj8wlATztPIz+GK+rn2SAqyg4XDDHUd6+afjPpQ0Txqm2IpFcLujfswzjH1HSiQGAaY3KYPelU5XNNNQBjchyp7HFK44pbkbbpx6nNNJytIRGpx3qZXOOtUwjbjl+KmUYH3qYG2nSpVqNRUgFMolSnCmpxT6AEDe1KWApMUbc9qAHCQY5pMrnNMYY7VC7MOKAJrgF0wjYqjJBKoJ5NTLKwNWY5Aw96AMC5WeRtgRiT7VesrExoPMIB9K09o5wRTSig9SaBFWeGMwspUEHis6wb7yHqpwa1pQMGsSOVRqMwX7uf1oA1BTlNRA5p2aQEwNOXJqFTmpkOBTGPBpQaZu5py/SgB+cimHpRTHJoAikaoWPNSsBUTdaAKd7CWAkT768iiGQSR78YYdR6GrqrlelZ8yG2n8zB2Nw1IRcifIrrfhf4gHh/xTFJK+y1ucRTHPC8/K34H+dcehGBjpTzhlIPII5pbCPoLT7FtH8d38ESqljrcf26JQPu3CYWVfxBDV2FnKxTY2FKgYzXE+CNSXxH4N0+6f95faYytnPzb0G1/++lOfxrq4Z8HcrYUYx9KtAadxcJbMrNna2BwK4v4z+FB4q8GtLYrnULMm4tv9ogfMn/AgPzArrbht0BJ5UjaSe3oaqafNLBN5MjFlOMHH1q9wPlzTpfNt1bkZHQ9qlfOa6f4o6CNA8ZzmBQtpf5uYgBwpJ+dfz5/4FXNMM81mxmRqQxMG9RVcNxV3Vl/dBx2NZu7ipEPVV5ZqQ3KKcAVCxJBANII/rQB06EZqXjiiiqKHKRT8jFFFAAKcDxRRQAh55NRuoNFFADDAKYI2U5BoopAPMhUdai871NFFMBk0uYmx6VjvHskSYdzhqKKQmaET5AqUMKKKAQ8MPWneYAKKKYxnnjdViOQHmiigCTIqKRgD1oooAgkYetRbst1oooAmQjFJPGsiFSOtFFAGdC5ilMDcj+GrCPzzRRSYmdx8Hdcl0zxdDZk5tr7MbLj+MDKn9CPxr3BVaGeSPHyAkoevynkD8On5UUU0xFq1PnRtHINyfd/Cqt0JrMrG7+Z8/yO3XHoff3ooqrgcN8b7VL7wtb6koAlsrnBPqrjBH5gGvH1O5KKKJDRVv0DWsg9sisNqKKgBEqWiigR/9k=" style="width:100%;height:100%;object-fit:cover;object-position:top center" alt="Mohammed Danish Amber"/>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:var(--head);font-size:22px;font-weight:900;color:#fff;line-height:1.1">Mohammed<br><span style="color:var(--red)">Danish Amber</span></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:7px;line-height:1.6">MANAGER · COGNIZANT SECURITY<br>ADVERSARY SIMULATOR · 14+ YRS</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--red);margin-top:5px">● KOLKATA, INDIA</div>
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center">
+        <span style="font-family:var(--mono);font-size:9px;padding:3px 7px;border:1px solid var(--red);color:var(--red);border-radius:2px;letter-spacing:1px">OSCP</span>
+        <span style="font-family:var(--mono);font-size:9px;padding:3px 7px;border:1px solid var(--red);color:var(--red);border-radius:2px;letter-spacing:1px">GREM</span>
+        <span style="font-family:var(--mono);font-size:9px;padding:3px 7px;border:1px solid var(--border2);color:var(--muted);border-radius:2px;letter-spacing:1px">ECSA</span>
+        <span style="font-family:var(--mono);font-size:9px;padding:3px 7px;border:1px solid var(--border2);color:var(--muted);border-radius:2px;letter-spacing:1px">CEH</span>
+        <span style="font-family:var(--mono);font-size:9px;padding:3px 7px;border:1px solid var(--border2);color:var(--muted);border-radius:2px;letter-spacing:1px">CHFI</span>
+        <span style="font-family:var(--mono);font-size:9px;padding:3px 7px;border:1px solid var(--border2);color:var(--muted);border-radius:2px;letter-spacing:1px">CCSK</span>
+        <span style="font-family:var(--mono);font-size:9px;padding:3px 7px;border:1px solid var(--border2);color:var(--muted);border-radius:2px;letter-spacing:1px">RHCE</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;width:100%">
+        <div style="font-family:var(--mono);font-size:10px;color:#555"><span style="color:var(--muted)">web</span> &nbsp;mohammeddanishamber.com</div>
+        <div style="font-family:var(--mono);font-size:10px;color:#555"><span style="color:var(--muted)">gh &nbsp;</span> github.com/mddanish</div>
+        <div style="font-family:var(--mono);font-size:10px;color:#555"><span style="color:var(--muted)">in &nbsp;&nbsp;</span> /mohammed-danish-amber</div>
+      </div>
+
+      <!-- AEGIS-X LOGO bottom -->
+      <div style="display:flex;align-items:center;gap:10px;margin-top:auto;padding-top:16px;border-top:1px solid var(--border)">
+        <canvas id="aegis-canvas-s00" width="44" height="44" style="flex-shrink:0"></canvas>
+        <div>
+          <div style="font-family:var(--head);font-size:17px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div>
+          <div style="font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:2px;margin-top:2px">OPERATOR PLATFORM</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MIDDLE: BIO + COMMUNITY + WHAT I BUILD -->
+    <div style="display:flex;flex-direction:column;gap:13px">
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:3px;margin-bottom:8px">// BACKGROUND</div>
+        <div style="font-size:14px;color:#bbb;line-height:1.7;font-weight:400">14+ years across offensive security, adversary emulation, red teaming &amp; DevSecOps.<br>Led security engineering teams at <strong style="color:#fff">Deloitte</strong>, <strong style="color:#fff">Ernst &amp; Young</strong>, and <strong style="color:#fff">Cognizant</strong>.<br>The person your EDR has nightmares about.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Community Roles</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <span style="color:var(--red);font-family:var(--mono);font-size:11px;flex-shrink:0;margin-top:2px">⬡</span>
+            <div style="font-size:13px;color:#bbb;line-height:1.5"><span style="color:#fff;font-weight:600">Null Open Security — Hyderabad Chapter</span><br>Ex-core member · organised monthly offensive security sessions &amp; threat briefings</div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <span style="color:var(--red);font-family:var(--mono);font-size:11px;flex-shrink:0;margin-top:2px">⬡</span>
+            <div style="font-size:13px;color:#bbb;line-height:1.5"><span style="color:#fff;font-weight:600">Raspberry Pi — Hyderabad Chapter</span><br>Ex-chapter head · embedded security workshops &amp; CTF hackathons</div>
+          </div>
+        </div>
+      </div>
+      <div class="card accent-border">
+        <div class="card-title">What I Build</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:10px;font-size:13px;color:#bbb;line-height:1.5"><span style="color:var(--red);font-family:var(--mono);font-size:11px;flex-shrink:0">//</span><div><span style="color:var(--red);font-weight:600">Aegis-X</span> — self-hosted pentest automation platform · React + OpenCode + kali-mcp</div></div>
+          <div style="display:flex;gap:10px;font-size:13px;color:#bbb;line-height:1.5"><span style="color:var(--red);font-family:var(--mono);font-size:11px;flex-shrink:0">//</span><div><span style="color:var(--red);font-weight:600">OpenCode agent stack</span> — 11 primary agents + 12 subagents · aegis-x-agents.md · ARC-OPENCODE</div></div>
+          <div style="display:flex;gap:10px;font-size:13px;color:#bbb;line-height:1.5"><span style="color:var(--red);font-family:var(--mono);font-size:11px;flex-shrink:0">//</span><div><span style="color:var(--red);font-weight:600">Home lab</span> — Proxmox + REMnux + FlareVM + hardware-segregated VLANs. Yes, it's always on.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: MITNICK QUOTE + JOKE -->
+    <div style="display:flex;flex-direction:column;gap:13px">
+      <div style="background:#080808;border:1px solid var(--border2);border-left:3px solid var(--red);border-radius:5px;padding:16px 18px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--red);letter-spacing:3px;margin-bottom:12px">// KEVIN MITNICK</div>
+        <div style="font-family:var(--head);font-size:17px;font-weight:700;color:#fff;line-height:1.5;font-style:italic">"The most secure computer is one that's turned off, locked in a safe, and buried 20 feet under the ground in a secret location — and I'm not even sure about that one."</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:12px;letter-spacing:1px">— Kevin Mitnick · The Art of Intrusion</div>
+      </div>
+      <div style="background:#090800;border:1px solid rgba(240,165,0,0.2);border-left:3px solid var(--amber);border-radius:5px;padding:15px 17px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:3px;margin-bottom:10px">// SECURITY CONFERENCE SPECIAL</div>
+        <div style="font-size:14px;color:#ccc;line-height:1.7">A CISO walks into a board meeting and says:<br><span style="color:#fff;font-weight:600">"We need to urgently discuss our security posture."</span><br><br>The CEO replies: <span style="color:var(--amber);">"Great news — I just renewed our antivirus."</span><br><br>The CISO has not slept since.</div>
+      </div>
+      <div style="background:rgba(255,31,31,0.03);border:1px solid var(--border);border-radius:5px;padding:13px 15px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:2px;margin-bottom:6px">// AND YET</div>
+        <div style="font-size:13px;color:#555;font-style:italic;line-height:1.6">"I also maintain a Proxmox lab at home, have named all the VMs, and refer to the NeverBreached AD as a 'realistic enterprise simulation.'<br>My family calls it 'the machine that runs all the time.'"</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 01 — TITLE
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s01">
+  <!-- ── AEGIS-X LOGO top-left ── -->
+  <div id="aegis-logo" style="position:absolute;top:22px;left:56px;display:flex;align-items:center;gap:12px;z-index:10">
+    <canvas id="aegis-canvas" width="52" height="52" style="flex-shrink:0"></canvas>
+    <div>
+      <div style="font-family:var(--head);font-size:20px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span> <span style="font-size:12px;color:var(--muted);font-weight:400">OPENCODE EDITION</span></div>
+      <div style="font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:3px;margin-top:2px">OPERATOR PLATFORM</div>
+    </div>
+  </div>
+
+
+
+  <!-- ── MAIN LAYOUT: left text + right animation panels ── -->
+  <div style="display:grid;grid-template-columns:1fr 420px;gap:0;flex:1;align-items:center;padding-top:20px">
+
+    <!-- LEFT: Title block -->
+    <div style="display:flex;flex-direction:column;justify-content:center">
+      <div class="red-line"></div>
+      <div style="margin-bottom:18px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--red);letter-spacing:3px;margin-bottom:5px">PRESENTED AT</div>
+        <div style="font-family:var(--body);font-size:13px;color:#ccc;font-weight:600;line-height:1.5">International Conference on Emerging Trends<br>in Cyber Security &amp; Digital Protection</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:2px">ICETCSDP 2026 &nbsp;·&nbsp; JUNE 2026</div>
+      </div>
+      <div style="font-family:var(--head);font-size:clamp(44px,6vw,78px);font-weight:900;line-height:0.95;color:#fff;margin-bottom:14px;letter-spacing:-1px">The <span class="accent">Agentic</span><br>Operator</div>
+      <div style="font-family:var(--head);font-size:clamp(18px,2.2vw,28px);font-weight:700;color:#ccc;letter-spacing:3px;margin-bottom:28px;line-height:1.2">AUTOMATING ADVERSARIAL REASONING<br>WITH LOCAL AI</div>
+      <div style="font-size:14px;color:var(--dim)">Mohammed Danish Amber &nbsp;·&nbsp; <span style="color:var(--red)">Manager, Cognizant Security</span></div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:6px;letter-spacing:1px">OpenCode Edition &nbsp;·&nbsp; 11 Primary Agents &nbsp;·&nbsp; 12 Sub-Agents</div>
+
+      <!-- ── CYCLE PILLS ── -->
+      <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">
+        <div id="pill-llm" class="cycle-pill" style="border-color:var(--red)">
+          <span class="cp-dot" style="background:var(--red)"></span>
+          <span class="cp-label">LLM REASONING CYCLE</span>
+          <span class="cp-status" id="llm-status">ACTIVE</span>
+        </div>
+        <div id="pill-rt" class="cycle-pill" style="border-color:#f0a500">
+          <span class="cp-dot" style="background:#f0a500"></span>
+          <span class="cp-label">RED TEAM CYCLE</span>
+          <span class="cp-status" id="rt-status" style="color:#f0a500">ACTIVE</span>
+        </div>
+        <div class="cycle-pill" style="border-color:#7ec8e3">
+          <span class="cp-dot" style="background:#7ec8e3;animation-delay:0.3s"></span>
+          <span class="cp-label">EDR EVASION CYCLE</span>
+          <span class="cp-status" style="color:#7ec8e3">ACTIVE</span>
+        </div>
+        <div class="cycle-pill" style="border-color:#4caf50">
+          <span class="cp-dot" style="background:#4caf50;animation-delay:0.6s"></span>
+          <span class="cp-label">OPERATOR LOOP</span>
+          <span class="cp-status" style="color:#4caf50">ACTIVE</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Four animation canvases in 2x2 grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:10px;height:100%;padding:0 0 0 16px">
+
+      <!-- LLM CYCLE canvas -->
+      <div style="background:var(--bg2);border:1px solid var(--border2);border-top:2px solid var(--red);border-radius:5px;padding:10px 14px;flex:1;min-height:0;position:relative;overflow:hidden">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--red);letter-spacing:3px;margin-bottom:6px">// LLM REASONING CYCLE</div>
+        <canvas id="llm-cycle-canvas" style="width:100%;height:calc(100% - 24px);display:block"></canvas>
+      </div>
+
+      <!-- RED TEAM CYCLE canvas -->
+      <div style="background:var(--bg2);border:1px solid var(--border2);border-top:2px solid #f0a500;border-radius:5px;padding:10px 14px;flex:1;min-height:0;position:relative;overflow:hidden">
+        <div style="font-family:var(--mono);font-size:9px;color:#f0a500;letter-spacing:3px;margin-bottom:6px">// RED TEAM ATTACK CYCLE</div>
+        <canvas id="rt-cycle-canvas" style="width:100%;height:calc(100% - 24px);display:block"></canvas>
+      </div>
+
+      <!-- EDR EVASION CYCLE canvas -->
+      <div style="background:var(--bg2);border:1px solid var(--border2);border-top:2px solid #7ec8e3;border-radius:5px;padding:10px 14px;min-height:0;position:relative;overflow:hidden">
+        <div style="font-family:var(--mono);font-size:9px;color:#7ec8e3;letter-spacing:3px;margin-bottom:6px">// EDR EVASION CYCLE</div>
+        <canvas id="edr-cycle-canvas" style="width:100%;height:calc(100% - 24px);display:block"></canvas>
+      </div>
+
+      <!-- OPERATOR LOOP canvas -->
+      <div style="background:var(--bg2);border:1px solid var(--border2);border-top:2px solid #4caf50;border-radius:5px;padding:10px 14px;min-height:0;position:relative;overflow:hidden">
+        <div style="font-family:var(--mono);font-size:9px;color:#4caf50;letter-spacing:3px;margin-bottom:6px">// OPERATOR CONTROL LOOP</div>
+        <canvas id="op-cycle-canvas" style="width:100%;height:calc(100% - 24px);display:block"></canvas>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 02 — THE QUESTION
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s02">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 1 — The Hook</div>
+  <div class="slide-title">What if your tools could <span class="accent">think?</span></div>
+  <div class="slide-sub">The gap between tool output and next action is entirely human</div>
+  <div class="content">
+    <div class="two-col" style="align-items:center;gap:32px">
+      <ul class="blist">
+        <li>Run nmap → read 2,000 lines → decide what matters → run next tool</li>
+        <li>That gap: where speed is lost, fatigue creeps in, engagements repeat</li>
+        <li>The <strong>tools</strong> aren't the bottleneck — <strong>you</strong> are</li>
+        <li>What changes when local AI sits in that gap — <strong>autonomously?</strong></li>
+      </ul>
+      <div style="text-align:center">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:3px;margin-bottom:14px">TODAY'S LOOP</div>
+        <div style="display:flex;flex-direction:column;gap:4px;font-family:var(--mono);font-size:12px;width:200px;margin:0 auto">
+          <div style="background:var(--bg2);border:1px solid var(--border2);padding:10px 18px;color:#ccc;border-radius:4px;text-align:center">RUN TOOL</div>
+          <div style="color:var(--red);text-align:center;font-size:11px;padding:2px 0">↓ human parses</div>
+          <div style="background:var(--bg2);border:1px solid var(--border2);padding:10px 18px;color:#ccc;border-radius:4px;text-align:center">READ OUTPUT</div>
+          <div style="color:var(--red);text-align:center;font-size:11px;padding:2px 0">↓ human decides</div>
+          <div style="background:var(--bg2);border:1px solid var(--border2);padding:10px 18px;color:#ccc;border-radius:4px;text-align:center">NEXT ACTION</div>
+          <div style="color:var(--red);text-align:center;font-size:11px;padding:2px 0">↓ human types</div>
+          <div style="background:rgba(255,31,31,0.08);border:1px solid var(--red);padding:10px 18px;color:var(--red);border-radius:4px;text-align:center;font-weight:700">REPEAT ∞<span class="term-cursor"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="humor-box">💡 Fun fact: The average pentester spends 40% of their time reading logs and 60% wondering why their nmap is still running.</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 03 — MANUAL LOOP
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s03">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 2 — The Landscape</div>
+  <div class="slide-title">The <span class="accent">Manual</span> Operator Loop</div>
+  <div class="slide-sub">Standard engagement flow — unchanged for 15 years</div>
+  <div class="content">
+    <div class="flow-row" style="margin-bottom:18px;position:relative"><div style="position:absolute;top:50%;left:0;right:0;height:2px;pointer-events:none;overflow:hidden"><div class="stream-dot"></div><div class="stream-dot"></div><div class="stream-dot"></div></div>
+      <div class="flow-box"><div class="fb-title">Recon</div><div class="fb-desc">Passive intel<br>OSINT</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box"><div class="fb-title">Enumerate</div><div class="fb-desc">Services<br>Users</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box"><div class="fb-title">Analyse</div><div class="fb-desc">Interpret<br>output</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box"><div class="fb-title">Exploit</div><div class="fb-desc">Controlled<br>action</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box"><div class="fb-title">Pivot</div><div class="fb-desc">Lateral<br>move</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box"><div class="fb-title">Report</div><div class="fb-desc">Document<br>findings</div></div>
+    </div>
+    <div style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:4px;margin-bottom:20px;font-weight:400">↑ &nbsp; HUMAN DECISION NODE AT EVERY STEP &nbsp; ↑</div>
+    <ul class="blist">
+      <li>Each step produces output the operator must <strong>mentally parse in real time</strong></li>
+      <li>Blocked attempt → read error, look up technique, try alternative — all manually</li>
+      <li>3 targets, 6 scopes, 1 operator → <strong>cognitive load is the constraint</strong></li>
+      <li>This is not a tools problem. This is a <strong>throughput problem.</strong></li>
+    </ul>
+    <div class="humor-box">⚠ "The methodology was solid. The execution was a grind." — every red teamer, after their 4th engagement this month.</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 04 — SCRIPTS TO REASONING
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s04">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 2 — The Landscape</div>
+  <div class="slide-title">From <span class="accent">Scripts</span> to Reasoning</div>
+  <div class="slide-sub">A paradigm shift in automated operations</div>
+  <div class="content">
+    <div class="two-col" style="margin-bottom:16px;gap:28px">
+      <div>
+        <div class="vcol-head bad">Scripts — Old Way</div>
+        <div class="vitem">If-this-then-that — pre-scripted, rigid logic</div>
+        <div class="vitem">Break on any unexpected output</div>
+        <div class="vitem">No awareness of <em>why</em> something failed</div>
+        <div class="vitem">Port 445 open → run enum4linux. Always.</div>
+        <div class="vitem">Zero adaptability against live defences</div>
+      </div>
+      <div class="vright">
+        <div class="vcol-head good">Agents — New Way</div>
+        <div class="vitem">Read output, understand context, decide, act</div>
+        <div class="vitem">Failure is data — triggers re-reasoning cycle</div>
+        <div class="vitem">Understands <em>why</em> it was blocked</div>
+        <div class="vitem">EDR block → pivots to in-memory execution</div>
+        <div class="vitem">Adapts TTPs on the fly, autonomously</div>
+      </div>
+    </div>
+    <div class="card accent-border">
+      <p style="font-family:var(--mono);font-size:13px;color:#bbb;line-height:1.8">"Moving beyond <span class="accent">if-this-then-that</span> scripts to <span style="color:#fff">the-environment-is-this-therefore-I-should-act-thus</span> agents.<br>The transition from <em>running tools</em> to <span class="accent">building operators.</span>"</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 05 — WHY LOCAL AI
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s05">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 2 — The Landscape</div>
+  <div class="slide-title">Why <span class="accent">Local AI</span></div>
+  <div class="slide-sub">OpSec is non-negotiable — public APIs are an immediate liability</div>
+  <div class="content">
+    <div class="two-col" style="margin-bottom:14px;gap:20px">
+      <div class="card danger-border">
+        <div class="card-title" style="color:#cc3333">Public API — High Risk ✗</div>
+        <ul class="blist" style="gap:9px">
+          <li>AD graph topology leaves your network</li>
+          <li>Internal hostnames &amp; IPs transmitted externally</li>
+          <li>Harvested credentials sent to 3rd party servers</li>
+          <li>Vulnerability details logged and retained</li>
+          <li>Safety filters refuse offensive security queries</li>
+        </ul>
+      </div>
+      <div class="card green-border">
+        <div class="card-title" style="color:var(--green)">Local Inference — OpSec Safe <span class="lock-icon">🔒</span></div>
+        <ul class="blist" style="gap:9px">
+          <li><strong>Zero external traffic</strong> — no API calls, ever</li>
+          <li>All sensitive data stays in your infrastructure</li>
+          <li>Air-gapped capable — no internet dependency</li>
+          <li>Unrestricted — no commercial safety filters</li>
+          <li>Hardware: GTX 860M / 16GB RAM — <strong>commodity</strong></li>
+        </ul>
+      </div>
+    </div>
+    <div class="humor-box">🔒 "Sending your client's AD topology to OpenAI to help you hack them is both an OpSec failure AND a uniquely creative business model." — please don't do this.</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 06 — FRAMEWORK MAP
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s06">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 3 — The Agent Landscape</div>
+  <div class="slide-title">Open-Source Agent <span class="accent">Frameworks</span></div>
+  <div class="slide-sub">A quick map of the ecosystem — mid-2025 onwards</div>
+  <div class="content top">
+    <table class="dtable" style="margin-bottom:14px">
+      <thead><tr><th>Framework</th><th>Built For</th><th>Agents / SubAgents</th><th>Skills</th><th>MCP</th><th>Offensive Ready</th></tr></thead>
+      <tbody>
+        <tr style="background:rgba(255,31,31,0.04)"><td style="color:var(--red)">OpenCode ★</td><td>Terminal coding agent</td><td>Plan + Build dual-agent</td><td>Via custom commands</td><td>✓ SSE + stdio</td><td><span class="badge by">THIS BUILD</span></td></tr>
+        <tr><td>Hermes Agent</td><td>Self-improving persistent agent</td><td>✓ Subordinate agents</td><td>✓ Native skill system</td><td>✓ 70+ tools + MCP</td><td><span class="badge bp">PARTIAL</span></td></tr>
+        <tr><td>Agent Zero</td><td>General-purpose autonomous</td><td>✓ Hierarchical sub-agents</td><td>Via prompt profiles</td><td>✓ MCP server + client</td><td><span class="badge bp">IGI FORK</span></td></tr>
+        <tr><td>DarkMoon</td><td>Purpose-built pentest engine</td><td>✓ 18 specialist agents</td><td>Implicit in agent roles</td><td>✓ Security gatekeeper</td><td><span class="badge by">YES</span></td></tr>
+      </tbody>
+    </table>
+    <div class="card accent-border" style="margin-bottom:12px">
+      <p>All share a common foundation: <strong style="color:#fff">Agents/SubAgents → Skills → MCP → Tools.</strong> None are plug-and-play for offensive ops without modification — <span class="accent">that gap is why this build exists.</span></p>
+    </div>
+    <div class="humor-box">📅 DarkMoon launched publicly while I was finishing this talk. So yes — I built the same thing manually that a team productised over 6 months. Totally fine. Totally.</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 07 — BUILDING BLOCKS
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s07">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 3 — The Agent Landscape</div>
+  <div class="slide-title">The Common <span class="accent">Building Blocks</span></div>
+  <div class="slide-sub">Agents.md · Skills.md · MCP · Tools — anatomy of every agent framework</div>
+  <div class="content top" style="overflow:hidden;min-height:0">
+    <div class="two-col" style="gap:16px;flex:1;min-height:0;overflow:hidden">
+      <div style="display:flex;flex-direction:column;gap:9px;overflow:hidden">
+        <div class="card" style="padding:12px 14px"><div class="card-title" style="margin-bottom:6px">Agents.md</div><p>The agent's identity, goals, constraints &amp; reasoning style. Not just a prompt — the <strong style="color:#fff">operating doctrine.</strong> Defines who the agent IS and how it thinks under any condition.</p></div>
+        <div class="card" style="padding:12px 14px"><div class="card-title" style="margin-bottom:6px">Skills.md</div><p style="font-size:13px">Reusable reasoning behaviours: <code style="font-family:var(--mono);color:var(--red);font-size:12px">adversarial_reasoning</code>, <code style="font-family:var(--mono);color:var(--red);font-size:12px">evasion_selection</code>, <code style="font-family:var(--mono);color:var(--red);font-size:12px">report_generation</code>. Think of them as SOPs the agent memorises and applies contextually.</p></div>
+        <div class="card" style="padding:12px 14px"><div class="card-title" style="margin-bottom:6px">Tools</div><p style="font-size:13px">Individual capabilities exposed via MCP: <code style="font-family:var(--mono);color:var(--red);font-size:12px">run_nmap</code>, <code style="font-family:var(--mono);color:var(--red);font-size:12px">execute_exploit</code>, <code style="font-family:var(--mono);color:var(--red);font-size:12px">send_telegram</code>. Agent selects the right tool from context — no hardcoding required.</p></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;overflow:hidden;min-height:0">
+        <div class="card accent-border" style="position:relative;padding:12px 14px"><canvas id="mcp-canvas" style="position:absolute;inset:0;width:100%;height:100%;border-radius:5px;pointer-events:none;opacity:0.4"></canvas><div class="card-title">MCP — The Bridge</div><p>Standardised protocol connecting the agent brain to external tools. The agent calls an MCP endpoint; the server runs the actual tool; structured output returns. One config block unlocks everything.</p></div>
+        <div class="code"><span class="c">// kali-mcp — the config that made this real</span>
+{
+  <span class="k">"mcpServers"</span>: {
+    <span class="n">"kali"</span>: {
+      <span class="k">"type"</span>: <span class="s">"sse"</span>,
+      <span class="k">"url"</span>: <span class="s">"http://localhost:8000/sse"</span>
+    }
+  }
+}</div>
+        <div class="card dark" style="padding:10px 14px"><p style="font-size:12px"><strong style="color:#fff">35 Kali tools → native agent capabilities</strong><br>nmap · nikto · gobuster · hydra · john · sqlmap · enum4linux...<br><span style="color:var(--red);font-family:var(--mono);font-size:10px">MCP ecosystem: +232% · Aug 2025 → Feb 2026</span></p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 08 — WHY NOT OOTB
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s08">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 3 — The Agent Landscape</div>
+  <div class="slide-title">Why <span class="accent">Not</span> Out of the Box?</div>
+  <div class="slide-sub">Four ways a default agent will embarrass you on a live engagement</div>
+  <div class="content top">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div class="card warn-flicker"><div class="card-title">01 — Context Window Burn</div><p>Nmap /24 = thousands of lines. Unmanaged logs fill the context window → reasoning degrades → hallucinations appear. You need surgical ingestion, not a raw dump into the model's working memory.</p></div>
+      <div class="card warn-flicker"><div class="card-title">02 — Hallucination</div><p>Wrong CVE IDs, invented tool flags, made-up IP addresses — all executed against live targets without hesitation. Needs constrained tool schemas, output validation, and confidence gating.</p></div>
+      <div class="card warn-flicker"><div class="card-title">03 — No Command Control</div><p>Default agents execute whatever the model decides. No scope boundary, no authorisation gating, no escalation limits. This is how you get a very uncomfortable call from a client at 3am.</p></div>
+      <div class="card warn-flicker"><div class="card-title">04 — Integration Gaps</div><p>Not wired for kali-mcp, C2 frameworks, or AD enumeration output formats. Requires custom MCP wiring, skill definitions, and output parsers tuned for security tooling response formats.</p></div>
+    </div>
+    <div class="humor-box">🤖 A default agent on a live pentest is like giving a new intern root access and saying "just figure it out." Technically possible. Professionally catastrophic.</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 09 — MODIFIED AGENT REQUIREMENTS
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s09">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 3 — The Agent Landscape</div>
+  <div class="slide-title">What a <span class="accent">Modified Agent</span> Needs</div>
+  <div class="slide-sub">Requirements discovered the hard way — so you don't have to</div>
+  <div class="content">
+    <table class="dtable">
+      <thead><tr><th>Requirement</th><th>Why It Matters</th><th>Solution in This Build</th></tr></thead>
+      <tbody>
+        <tr><td>Selective context management</td><td>Raw logs burn context fast, degrade reasoning quality</td><td>Hermes skill: ingest summaries only, not full output</td></tr>
+        <tr><td>Adversarial reasoning skill</td><td>Generic LLM reasoning ≠ offensive security reasoning</td><td>Custom adversarial_reasoning.md skill file</td></tr>
+        <tr><td>kali-mcp native wiring</td><td>Tools must be accessible as MCP endpoints</td><td>kali-mcp SSE server running on port 8000</td></tr>
+        <tr><td>Command gating</td><td>Zero unbounded execution on live target scopes</td><td>Operator profiles enforced at MCP call layer</td></tr>
+        <tr><td>Self-correction on failure</td><td>EDR blocks, unexpected output, tool errors</td><td>Skill: parse error → analyse → retry alternate technique</td></tr>
+        <tr><td>Mobile C2 visibility</td><td>Operator needs awareness without being at keyboard</td><td>Telegram bot integration — live session updates</td></tr>
+        <tr><td>Air-gapped / offline</td><td>OpSec requirement — zero cloud inference calls</td><td>Ollama local inference running on operator laptop</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 10 — STACK OVERVIEW
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s10">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 4 — Architecture</div>
+  <div class="slide-title">Stack <span class="accent">Overview</span></div>
+  <div class="slide-sub">Proxmox · Ollama (Laptop) · OpenCode LXC · Kali VM + kali-mcp · HTB via OpenVPN</div>
+  <div class="content">
+    <!-- ROW 1: Laptop → Hermes LXC -->
+    <div style="display:flex;align-items:center;gap:0;margin-bottom:10px;width:100%">
+      <div class="abox solo" style="flex:0 0 220px">
+        <div class="ab-title">Laptop (External to Proxmox)</div>
+        <div class="ab-body"><strong style="color:var(--red)">Ollama</strong> — local LLM inference<br>GTX 860M · 16GB RAM · zero cloud</div>
+      </div>
+      <div class="aarr" style="padding:0 12px;font-size:22px">──▶</div>
+      <div class="abox acc solo" style="flex:1">
+        <div class="ab-title">OpenCode LXC — Ubuntu 24.04</div>
+        <div class="ab-body"><strong>/usr/bin/opencode</strong> · opencode-web.service (:80) · Plan/Build dual-agent<br>aegis-x-agents.md · npm i -g opencode-ai · connects to Ollama over network</div>
+      </div>
+    </div>
+    <!-- ARROW DOWN -->
+    <div class="stack-arrow" style="text-align:center;color:var(--red);font-family:var(--mono);font-size:20px;margin:0 0 10px 0;padding-left:276px;font-weight:700">↓</div>
+    <!-- ROW 2: Kali VM -->
+    <div style="display:flex;align-items:center;gap:0;margin-bottom:10px;width:100%">
+      <div style="flex:0 0 276px"></div>
+      <div class="abox solo" style="flex:1">
+        <div class="ab-title">Kali Linux VM — Proxmox Guest</div>
+        <div class="ab-body"><strong>kali-mcp</strong> SSE :8000 · 35 tools · <span style="color:#4caf50;font-family:var(--mono);font-size:10px">● OpenVPN → HackTheBox (tun0 · 10.10.x.x)</span><br><span style="color:var(--red);font-size:11px;font-family:var(--mono)">nmap · nikto · gobuster · hydra · john · sqlmap · enum4linux · metasploit...</span></div>
+      </div>
+    </div>
+    <!-- ARROW DOWN -->
+    <div class="stack-arrow" style="text-align:center;color:var(--red);font-family:var(--mono);font-size:20px;margin:0 0 10px 0;padding-left:276px;font-weight:700;animation-delay:0.4s">↓</div>
+    <!-- ROW 3: Target -->
+    <div style="display:flex;align-items:center;gap:0;width:100%">
+      <div style="flex:0 0 276px"></div>
+      <div class="abox danger solo" style="flex:1">
+        <div class="ab-title" style="color:#cc3333">Target — HackTheBox Machine</div>
+        <div class="ab-body">Active HTB machine · accessible via OpenVPN tun0 · 10.10.x.x · real defences · authorised scope</div>
+      </div>
+    </div>
+    <div class="humor-box">💼 Laptop (Ollama) + Proxmox (OpenCode LXC + Kali VM) + HTB subscription. That's the whole stack.</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 11 — MULTI-AGENT FRAMEWORK
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s11">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 4 — Architecture</div>
+  <div class="slide-title">Multi-Agent <span class="accent">Framework</span></div>
+  <div class="slide-sub">Operator Agent orchestrating 6 specialised sub-agents in parallel and serial chains</div>
+  <div class="content">
+    <!-- Orchestrator -->
+    <div style="display:flex;justify-content:center;margin-bottom:14px">
+      <div style="background:rgba(255,31,31,0.06);border:1px solid var(--red);border-radius:5px;padding:12px 40px;font-family:var(--head);font-size:17px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:2px">red-operator — Primary Agent (OpenCode)</div>
+    </div>
+    <!-- Down arrow -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px;font-family:var(--mono);font-size:15px;font-weight:700;color:var(--red)"><span class="pulse-dot" style="animation-delay:0s;flex-shrink:0"></span><span class="pulse-dot" style="animation-delay:0.5s;background:var(--amber);flex-shrink:0"></span><span>↓ &nbsp; delegates to specialists &nbsp; ↓</span><span class="pulse-dot" style="animation-delay:1s;background:var(--green);flex-shrink:0"></span><span class="pulse-dot" style="animation-delay:0.25s;flex-shrink:0"></span></div>
+    <!-- Sub-agents grid -->
+    <div class="three-col" style="margin-bottom:16px">
+      <div class="card" style="text-align:center"><div class="card-title">Recon</div><p>Passive intel · OSINT<br>Target enumeration</p></div>
+      <div class="card" style="text-align:center"><div class="card-title">Scan</div><p>Active scanning<br>Service fingerprinting</p></div>
+      <div class="card" style="text-align:center"><div class="card-title">Analysis</div><p>Output interpretation<br>Vulnerability mapping</p></div>
+      <div class="card" style="text-align:center"><div class="card-title">Exploit</div><p>Controlled exploitation<br>Within defined scope</p></div>
+      <div class="card" style="text-align:center"><div class="card-title">OSINT</div><p>Org intel<br>Employee enumeration</p></div>
+      <div class="card" style="text-align:center"><div class="card-title">Report</div><p>Finding docs<br>Risk scoring · Narrative</p></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <div class="pill pr">PARALLEL: Recon + OSINT</div>
+      <div class="pill pg">SERIAL: Scan → Analysis → Exploit</div>
+      <div class="pill pgg">TRIGGERED: Report on finding</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 12 — THINK → ACT → OBSERVE
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s12">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 4 — Architecture</div>
+  <div class="slide-title">Think <span class="accent">→</span> Act <span class="accent">→</span> Observe</div>
+  <div class="slide-sub">The autonomous reasoning loop — where scripted automation ends and actual reasoning begins</div>
+  <div class="content">
+    <!-- Loop diagram -->
+    <div class="flow-row" style="margin-bottom:22px">
+      <div class="flow-box hl">
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px"><div class="loop-spinner"></div><div class="fb-title">Think</div></div>
+        <div class="fb-desc">Plan agent system prompt<br>"What does this mean tactically?<br>What is the optimal next action?"</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">
+        <div class="fb-title">Act</div>
+        <div class="fb-desc">Call kali-mcp tool via MCP<br>run_nmap · execute_exploit<br>run_sqlmap · run_john</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">
+        <div class="fb-title">Observe</div>
+        <div class="fb-desc">Capture structured output<br>Success → update world state<br>Failure → parse why → re-Think</div>
+      </div>
+      <div class="flow-arrow" style="font-size:22px">↩</div>
+    </div>
+    <!-- Self-correction example -->
+    <div class="card accent-border">
+      <div class="card-title">Self-Correction Example — Live EDR Bypass</div>
+      <div style="display:flex;gap:20px;margin-top:6px;align-items:center">
+        <div style="flex:1;font-family:var(--mono);font-size:12px;color:#777;line-height:1.9">
+          1. Attempt standard credential dump (Mimikatz pattern)<br>
+          2. Sophos EDR blocks → <span style="color:#cc3333">Access Denied — AMSI.PS.CredentialHarvesting.A</span><br>
+          3. <span class="accent">Agent reads error → identifies signature-based detection</span><br>
+          4. Re-Think: "need fileless, memory-only, no PowerShell hooks"<br>
+          5. Reflective in-memory .NET execution via kali-mcp → <span style="color:var(--green)">Success</span>
+        </div>
+        <div style="border-left:1px solid var(--border2);padding-left:20px;text-align:center;flex-shrink:0">
+          <div class="big-stat">~3s</div>
+          <div class="big-label">full loop</div>
+          <div style="font-family:var(--mono);font-size:10px;color:#333;margin-top:5px">zero humans</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 12b — AI RED TEAM: BRIDGING RECON & C2
+     Animated recreation of the uploaded diagram
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s12b">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 4 — Architecture</div>
+  <div class="slide-title">The AI Red Team: <span class="accent">Recon → Brain → C2</span></div>
+  <div class="slide-sub">BloodHound maps the environment · LLM reasons · Havoc executes</div>
+  <div style="flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">
+
+    <!-- TOP ROW: Three components -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;flex-shrink:0">
+
+      <!-- BloodHound -->
+      <div class="card" id="comp-bh" style="border-color:#0088cc;text-align:center;opacity:0;transform:translateY(-16px);transition:all 0.6s ease 0.2s">
+        <div style="font-family:var(--head);font-size:14px;font-weight:700;color:#0088cc;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">BloodHound — The Mapper</div>
+        <div style="position:relative;height:70px;margin-bottom:8px">
+          <canvas id="bh-canvas" width="100%" height="70" style="width:100%;height:70px"></canvas>
+        </div>
+        <p style="font-size:12px;color:#777;line-height:1.5">Identity analysis tool using graph theory to reveal hidden AD relationships and attack paths. SharpHound collector → JSON → Neo4j graph model.</p>
+      </div>
+
+      <!-- LLM Brain -->
+      <div class="card" id="comp-llm" style="border-color:var(--red);text-align:center;opacity:0;transform:translateY(-16px);transition:all 0.6s ease 0.5s">
+        <div style="font-family:var(--head);font-size:14px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">LLM (Ollama) — The Brain</div>
+        <div style="position:relative;height:70px;display:flex;align-items:center;justify-content:center;margin-bottom:8px">
+          <div id="brain-pulse" style="width:50px;height:50px;border-radius:50%;background:rgba(255,31,31,0.1);border:2px solid var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--head);font-size:20px;font-weight:900;color:var(--red);position:relative">
+            <div style="position:absolute;inset:-6px;border-radius:50%;border:1px solid rgba(255,31,31,0.3);animation:pulse-ring 2s ease-out infinite"></div>
+            <div style="position:absolute;inset:-12px;border-radius:50%;border:1px solid rgba(255,31,31,0.15);animation:pulse-ring 2s ease-out infinite 0.4s"></div>
+            AI
+          </div>
+        </div>
+        <p style="font-size:12px;color:#777;line-height:1.5">Interprets BloodHound graph output, identifies attack paths, formulates precise tool commands. Reasons about privilege relationships — GenericAll, DCSync, HasSession.</p>
+      </div>
+
+      <!-- Havoc C2 -->
+      <div class="card" id="comp-hv" style="border-color:#8844cc;text-align:center;opacity:0;transform:translateY(-16px);transition:all 0.6s ease 0.8s">
+        <div style="font-family:var(--head);font-size:14px;font-weight:700;color:#8844cc;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Havoc — The C2 Framework</div>
+        <div style="height:70px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;gap:10px">
+          <div style="background:#0d0d0d;border:1px solid #333;border-radius:3px;padding:6px 12px;font-family:var(--mono);font-size:11px;color:#8844cc">Team Server</div>
+          <div style="color:#555;font-family:var(--mono)">→</div>
+          <div style="background:#0d0d0d;border:1px solid #333;border-radius:3px;padding:6px 12px;font-family:var(--mono);font-size:11px;color:#cc44ff">Demon</div>
+        </div>
+        <p style="font-size:12px;color:#777;line-height:1.5">Modern malleable C2. Manages compromised hosts via Demon implants. Receives commands from LLM brain, executes against target, returns results.</p>
+      </div>
+    </div>
+
+    <!-- FLOW CONNECTOR LINE -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:0;flex-shrink:0;opacity:0;transition:opacity 0.5s ease 1.1s" id="flow-connector">
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,#0088cc,var(--red))"></div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);padding:0 12px;letter-spacing:2px">THE AUTOMATED ATTACK CYCLE</div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,var(--red),#8844cc)"></div>
+    </div>
+
+    <!-- BOTTOM ROW: 7-step attack cycle -->
+    <div style="display:flex;align-items:stretch;gap:0;flex:1;min-height:0" id="attack-cycle">
+
+      <!-- Step 1 -->
+      <div class="cycle-step" id="cy1" style="flex:1;display:flex;flex-direction:column;gap:5px;opacity:0;transform:translateY(14px);transition:all 0.5s ease 1.3s">
+        <div class="cy-num">1</div>
+        <div class="cy-title">Recon on Target</div>
+        <div class="cy-body">SharpHound collector executed. Gathers domain users, groups, sessions, GPOs.</div>
+        <div class="cy-tag" style="background:rgba(0,136,204,0.1);border-color:rgba(0,136,204,0.3);color:#0088cc">BloodHound</div>
+      </div>
+      <div class="cy-arrow" id="ca1" style="opacity:0;transition:opacity 0.3s ease 1.55s">→</div>
+
+      <!-- Step 2 -->
+      <div class="cycle-step" id="cy2" style="flex:1;display:flex;flex-direction:column;gap:5px;opacity:0;transform:translateY(14px);transition:all 0.5s ease 1.5s">
+        <div class="cy-num">2</div>
+        <div class="cy-title">Ingest &amp; Analyse</div>
+        <div class="cy-body">JSON output uploaded to BloodHound GUI. Maps all relationships — MemberOf, AdminTo, HasSession.</div>
+        <div class="cy-tag" style="background:rgba(0,136,204,0.1);border-color:rgba(0,136,204,0.3);color:#0088cc">BloodHound</div>
+      </div>
+      <div class="cy-arrow" id="ca2" style="opacity:0;transition:opacity 0.3s ease 1.75s">→</div>
+
+      <!-- Step 3 -->
+      <div class="cycle-step" id="cy3" style="flex:1;display:flex;flex-direction:column;gap:5px;opacity:0;transform:translateY(14px);transition:all 0.5s ease 1.7s">
+        <div class="cy-num">3</div>
+        <div class="cy-title">Identify Attack Path</div>
+        <div class="cy-body">Cypher query finds: User Olivia has <span style="color:var(--red);font-family:var(--mono);font-size:10px">GenericAll</span> over User Michael → path to Domain Admins.</div>
+        <div class="cy-tag" style="background:rgba(255,31,31,0.08);border-color:rgba(255,31,31,0.3);color:var(--red)">LLM Reasons</div>
+      </div>
+      <div class="cy-arrow" id="ca3" style="opacity:0;transition:opacity 0.3s ease 1.95s">→</div>
+
+      <!-- Step 4 -->
+      <div class="cycle-step" id="cy4" style="flex:1;display:flex;flex-direction:column;gap:5px;opacity:0;transform:translateY(14px);transition:all 0.5s ease 1.9s">
+        <div class="cy-num">4</div>
+        <div class="cy-title">LLM Tactical Decision</div>
+        <div class="cy-body">LLM interprets: GenericAll allows forced password reset or shadow credentials attack. Selects next action.</div>
+        <div class="cy-tag" style="background:rgba(255,31,31,0.08);border-color:rgba(255,31,31,0.3);color:var(--red)">LLM Decides</div>
+      </div>
+      <div class="cy-arrow" id="ca4" style="opacity:0;transition:opacity 0.3s ease 2.15s">→</div>
+
+      <!-- Step 5 -->
+      <div class="cycle-step" id="cy5" style="flex:1;display:flex;flex-direction:column;gap:5px;opacity:0;transform:translateY(14px);transition:all 0.5s ease 2.1s">
+        <div class="cy-num">5</div>
+        <div class="cy-title">Generate C2 Command</div>
+        <div class="cy-body">LLM formulates: PowerShell to reset Michael's password. Outputs precise Havoc task JSON.</div>
+        <div class="cy-tag" style="background:rgba(136,68,204,0.1);border-color:rgba(136,68,204,0.3);color:#8844cc">Havoc</div>
+      </div>
+      <div class="cy-arrow" id="ca5" style="opacity:0;transition:opacity 0.3s ease 2.35s">→</div>
+
+      <!-- Step 6 -->
+      <div class="cycle-step" id="cy6" style="flex:1;display:flex;flex-direction:column;gap:5px;opacity:0;transform:translateY(14px);transition:all 0.5s ease 2.3s">
+        <div class="cy-num">6</div>
+        <div class="cy-title">Execute via C2</div>
+        <div class="cy-body">Havoc Team Server relays command to Demon implant on compromised host. Result returned.</div>
+        <div class="cy-tag" style="background:rgba(136,68,204,0.1);border-color:rgba(136,68,204,0.3);color:#8844cc">Havoc</div>
+      </div>
+      <div class="cy-arrow" id="ca6" style="opacity:0;transition:opacity 0.3s ease 2.55s">→</div>
+
+      <!-- Step 7 -->
+      <div class="cycle-step" id="cy7" style="flex:1;display:flex;flex-direction:column;gap:5px;opacity:0;transform:translateY(14px);transition:all 0.5s ease 2.5s">
+        <div class="cy-num" style="color:var(--red)">7</div>
+        <div class="cy-title" style="color:var(--red)">Pivot &amp; Repeat</div>
+        <div class="cy-body">Michael's account compromised. New privileges. Loop restarts — run SharpHound again, find new paths.</div>
+        <div class="cy-tag" style="background:rgba(255,31,31,0.08);border-color:rgba(255,31,31,0.3);color:var(--red)">Loop ↺</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 13 — OPERATOR PROFILES
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s13">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 4 — Architecture</div>
+  <div class="slide-title">Operator <span class="accent">Profiles</span></div>
+  <div class="slide-sub">Tab to switch agents · different permission layer · zero code changes</div>
+  <div class="content">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:3px;margin-bottom:14px">CAPABILITY LEVEL — OpenCode frontmatter · Enforced per-agent</div>
+    <div class="prow"><div class="pname">WHITE HAT</div><div class="pbar"><div class="pfill-bar" style="width:25%"></div></div><div class="plabel">Recon + Scan only — no exploitation</div></div>
+    <div class="prow"><div class="pname">GREY HAT</div><div class="pbar"><div class="pfill-bar" style="width:50%"></div></div><div class="plabel">+ Vulnerability identification</div></div>
+    <div class="prow"><div class="pname">RED OPERATOR</div><div class="pbar"><div class="pfill-bar" style="width:80%"></div></div><div class="plabel">Full kill chain — no persistence</div></div>
+    <div class="prow"><div class="pname">BLACK HAT</div><div class="pbar"><div class="pfill-bar" style="width:100%"></div></div><div class="plabel">Unrestricted — <span class="accent">lab demo only</span></div></div>
+    <div class="code" style="margin-top:18px"><span class="c"># red-operator.md — .opencode/agents/ — permission enforced per-agent</span>
+<span class="k">task: scope/recon/scan/analysis:</span> <span class="s">allow</span>
+<span class="k">task: exploit/post-exploit:</span>      <span class="s">ask  <span class="c"># human gate</span></span>
+<span class="k">bash:</span> <span class="s">allow</span> &nbsp; <span class="k">edit:</span> <span class="s">allow</span> &nbsp; <span class="k">webfetch:</span> <span class="s">ask</span> <span class="lock-icon" style="font-size:11px">🔒</span>
+<span class="k">temperature:</span> <span class="s">0.3</span> &nbsp; <span class="k">top_p:</span> <span class="s">0.90</span> &nbsp; <span class="k">steps:</span> <span class="s">60</span>
+<span class="k">task &quot;*&quot;:</span> <span class="s">deny</span>  <span class="c"># default deny all unlisted</span> <span class="lock-icon" style="font-size:11px">🔒</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 14 — NEVERBREACHED TARGET
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s14">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none"><canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas><div><div style="font-family:var('Barlow Condensed','Barlow Condensed',sans-serif);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:#FF1F1F">-X</span></div></div></div>
+  <div class="slide-label">Section 5 — Demo · Part 1 of 2</div>
+  <div class="slide-title">Demo Setup — <span class="accent">HackTheBox</span></div>
+  <div class="slide-sub">OpenCode agent + kali-mcp + OpenVPN → live HTB machine · real defences</div>
+  <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:16px;overflow:hidden;min-height:0">
+    <div class="card" style="border-color:#9fef00">
+      <div class="card-title" style="color:#9fef00">HackTheBox — Live Demo Target</div>
+      <div style="display:flex;align-items:center;gap:16px;margin-top:4px">
+        <div style="font-family:var(--mono);font-size:12px;color:#bbb;line-height:2;flex:1">
+          <span style="color:#9fef00">●</span> Kali VM connected via <strong style="color:#fff">OpenVPN</strong> (tun0)<br>
+          <span style="color:#9fef00">●</span> HTB machine reachable at <strong style="color:#fff">10.10.x.x</strong><br>
+          <span style="color:#9fef00">●</span> red-operator agent scopes target to HTB IP<br>
+          <span style="color:#9fef00">●</span> kali-mcp tools execute against live machine<br>
+          <span style="color:#9fef00">●</span> Real defences — not a seeded lab environment
+        </div>
+        <div style="text-align:center;flex-shrink:0;padding:0 16px">
+          <div style="font-family:var(--head);font-size:44px;font-weight:900;color:#9fef00;line-height:1;text-shadow:0 0 20px rgba(159,239,0,0.3)">HTB</div>
+          <div style="font-family:var(--mono);font-size:9px;color:#555;margin-top:4px;letter-spacing:2px">LIVE TARGET</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">OpenVPN Setup</div>
+      <div class="code" style="font-size:11.5px"><span class="c"># On Kali VM before demo</span>
+<span class="k">sudo openvpn</span> <span class="s">~/htb-lab.ovpn</span>
+<span class="c"># verify tunnel</span>
+<span class="k">ip addr show tun0</span>
+<span class="c"># confirm target reachable</span>
+<span class="k">ping -c1</span> <span class="s">10.10.x.x</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">What You Will See On Screen</div>
+      <ul class="blist" style="gap:8px">
+        <li>OpenCode web UI (:80) — Plan/Build agent conversation live</li>
+        <li>Plan agent reasoning: tool selection, path decisions, CVE analysis</li>
+        <li>Build agent kali-mcp calls: nmap, gobuster, sqlmap output in real time</li>
+        <li><strong>exploit:ask gate</strong> — approval prompt visible before each exploit</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s14b">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none"><canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas><div><div style="font-family:var('Barlow Condensed','Barlow Condensed',sans-serif);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:#FF1F1F">-X</span></div></div></div>
+  <div class="slide-label">Section 5 — Demo · Part 2 of 2</div>
+  <div class="slide-title">Demo Setup — <span class="accent">Architecture & Policy</span></div>
+  <div class="slide-sub">Stack layout · authorisation · HTB policy note</div>
+  <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:16px;overflow:hidden;min-height:0">
+    <div style="border:1px solid var(--amber);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;min-height:0;overflow:hidden">
+      <div class="card-title" style="color:var(--amber);margin-bottom:10px">Demo Architecture</div>
+      <canvas id="arch-canvas" style="flex:1;width:100%;min-height:0;display:block"></canvas>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;min-height:0;overflow:hidden">
+    <div class="card">
+      <div class="card-title">Authorisation</div>
+      <p>Demo against an <strong style="color:#fff">authorised HTB machine</strong>. HackTheBox authorises all activity on their platform by design. Activity stays within the OpenVPN tunnel.</p>
+      <div style="margin-top:10px;background:rgba(240,165,0,0.06);border-left:2px solid var(--amber);padding:8px 10px;border-radius:0 3px 3px 0">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:2px;margin-bottom:4px">NOTE</div>
+        <p style="font-size:11px;color:#999;line-height:1.6">As of the publication of this presentation, the target HTB machine has not been retired. In accordance with HackTheBox policy, session recordings, exploit details, and writeups cannot be shared until the machine is officially retired.</p>
+      </div>
+    </div>
+    <div class="card dark">
+      <div class="card-title">Why HTB vs Local Lab</div>
+      <p>Real defences. Real patching state. Real network stack. Same OpenCode methodology — validated against production-grade targets.</p>
+    </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s15">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none"><canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas><div><div style="font-family:var('Barlow Condensed','Barlow Condensed',sans-serif);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:#FF1F1F">-X</span></div></div></div>
+  <div class="slide-label">Section 5 — Demo</div>
+  <div class="slide-title">Kill Chain — <span class="accent">What You're About to See</span></div>
+  <div class="slide-sub">Autonomous compromise · red-operator agent · HTB machine over OpenVPN</div>
+  <div class="content" style="overflow:hidden;min-height:0">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px">
+      <div class="crosshair"><svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="18" r="14" stroke="#FF1F1F" stroke-width="1" stroke-dasharray="4 3"/><circle cx="18" cy="18" r="5" stroke="#FF1F1F" stroke-width="1.5"/><line x1="18" y1="0" x2="18" y2="10" stroke="#FF1F1F" stroke-width="1"/><line x1="18" y1="26" x2="18" y2="36" stroke="#FF1F1F" stroke-width="1"/><line x1="0" y1="18" x2="10" y2="18" stroke="#FF1F1F" stroke-width="1"/><line x1="26" y1="18" x2="36" y2="18" stroke="#FF1F1F" stroke-width="1"/></svg></div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:2px">TARGET LOCKED · 10.10.x.x · OpenVPN ACTIVE · INITIATING CHAIN<span class="term-cursor" style="height:12px;width:6px"></span></div>
+    </div>
+    <div class="chain-step" style="padding:6px 0"><div class="chain-num" style="font-size:22px;width:26px">1</div><div class="chain-body"><div class="chain-main" style="font-size:13px">run_nmap against HTB target (10.10.x.x) → port scan + service fingerprint</div><div class="chain-aside">// Plan: "enumerate target" → Build: kali.run_nmap("-sV -sC 10.10.x.x")</div></div></div>
+    <div class="chain-step" style="padding:6px 0"><div class="chain-num" style="font-size:22px;width:26px">2</div><div class="chain-body"><div class="chain-main" style="font-size:13px">Service version identified → CVE matched → initial foothold</div><div class="chain-aside">// Plan: CVE analysis → exploit selection → Build fires kali-mcp</div></div></div>
+    <div class="chain-step" style="padding:6px 0"><div class="chain-num" style="font-size:22px;width:26px">3</div><div class="chain-body"><div class="chain-main" style="font-size:13px">Web enumeration via run_gobuster → credentials or sensitive config found</div><div class="chain-aside">// Plan: "enumerate web paths" → Build: kali.run_gobuster()</div></div></div>
+    <div class="chain-step" style="padding:6px 0"><div class="chain-num" style="font-size:22px;width:26px">4</div><div class="chain-body"><div class="chain-main" style="font-size:13px">Privilege escalation path identified → lateral movement</div><div class="chain-aside">// Plan reasons from context → selects privesc technique</div></div></div>
+    <div class="chain-step" style="padding:6px 0"><div class="chain-num" style="font-size:22px;width:26px">5</div><div class="chain-body"><div class="chain-main" style="font-size:13px">run_john / run_hydra → hash cracking or credential bruteforce</div><div class="chain-aside">// exploit:ask gate fires → operator approves → Build executes</div></div></div>
+    <div class="chain-step" style="padding:6px 0"><div class="chain-num" style="font-size:22px;width:26px">6</div><div class="chain-body"><div class="chain-main" style="font-size:13px">Root / user flag captured on HTB machine — <span class="accent">pwned</span></div><div class="chain-aside">// Full decision chain auto-documented in OpenCode session log</div></div></div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <div class="pill pr">OpenCode Web UI (:80) — Plan/Build live</div>
+      <div class="pill pg">kali-mcp tool calls — real time output</div>
+      <div class="pill pgg">exploit:ask gate — visible on screen</div>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s16">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 6 — Implications</div>
+  <div class="slide-title">What This Means for <span class="accent">Red Teams</span></div>
+  <div class="slide-sub">Scale, consistency, speed — the operator becomes a strategist</div>
+  <div class="content">
+    <table class="dtable" style="margin-bottom:14px">
+      <thead><tr><th>Before — Human-paced</th><th>After — Agentic</th></tr></thead>
+      <tbody>
+        <tr><td>1 operator, 1 target at a time</td><td style="color:var(--green)">1 operator, N concurrent agent sessions</td></tr>
+        <tr><td>Parse every tool output manually</td><td style="color:var(--green)">Operator reviews decisions, not raw logs</td></tr>
+        <tr><td>Quality degrades under fatigue at 2am</td><td style="color:var(--green)">Same reasoning quality at 2am as at 9am</td></tr>
+        <tr><td>Manual documentation mid-engagement</td><td style="color:var(--green)">Agent logs every decision automatically</td></tr>
+        <tr><td>Recon-to-foothold: hours to days</td><td style="color:var(--green)">Recon-to-foothold: minutes</td></tr>
+      </tbody>
+    </table>
+    <div class="card accent-border" style="margin-bottom:12px">
+      <p>The operator's new role: <strong style="color:#fff">strategist, not executor.</strong> Define the profile, set the scope, review findings, make judgment calls on ambiguous decisions. The agent handles the execution grind.</p>
+    </div>
+    <div class="humor-box">📊 "Wait, I can run 3 concurrent engagements while the agent does the recon?" &nbsp; Yes. You're welcome. Your billing rate stays exactly the same.</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 17 — DEFENDERS
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s17">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 6 — Implications</div>
+  <div class="slide-title">What This Means for <span class="accent">Defenders</span></div>
+  <div class="slide-sub">Signature-based detection is increasingly obsolete — detect reasoning, not tools</div>
+  <div class="content">
+    <div class="ig" style="margin-bottom:14px">
+      <div class="icard d">
+        <div class="ic-head">Legacy Detection — Fragile</div>
+        <ul>
+          <li>File hashes (mimikatz.exe) — agent uses in-memory variant</li>
+          <li>Static C2 domains/IPs — agent uses legitimate protocols</li>
+          <li>Specific PowerShell strings — indirect syscalls bypass this</li>
+          <li>Assumes attacker repeats identical behaviour. They won't.</li>
+        </ul>
+      </div>
+      <div class="icard s">
+        <div class="ic-head">Next-Gen Detection — Resilient</div>
+        <ul>
+          <li>Anomalous graph/Cypher queries against AD topology</li>
+          <li>Unusual sequences of tool invocations over time</li>
+          <li>Behavioural chains: recon → cred access → lateral movement</li>
+          <li>Detect <em>reasoning intent</em> — not individual artifact signatures</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card accent-border" style="margin-bottom:12px">
+      <p style="font-family:var(--mono);font-size:13px;color:#ccc">"Does this sequence of behaviours, taken together, describe an <span class="accent">adversarial campaign?</span>"</p>
+    </div>
+    <div class="humor-box">🛡 If you're still detecting mimikatz.exe by file hash in 2025 — the agent already got Domain Admin and is writing the report.</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 18 — LLM OS
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s18">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 6 — Implications</div>
+  <div class="slide-title">The <span class="accent">LLM OS</span> — The Bigger Picture</div>
+  <div class="slide-sub">This isn't a chatbot. It's the kernel process of an emerging operating system.</div>
+  <div class="content">
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;margin-bottom:20px">
+      <div class="card" style="text-align:center">
+        <div class="card-title">Context Window</div>
+        <p><strong style="color:#fff;font-size:22px;font-family:var(--head)">= RAM</strong><br>When it fills, reasoning degrades. Manage it like a finite resource, not an infinite buffer.</p>
+      </div>
+      <!-- Orbit widget -->
+      <div class="orbit-wrap">
+        <div class="orbit-ring"></div>
+        <div class="orbit-center">LLM</div>
+        <div class="orbit-item o1" title="kali-mcp">⚙</div>
+        <div class="orbit-item o2" title="Telegram">📱</div>
+        <div class="orbit-item o3" title="BloodHound">🔍</div>
+      </div>
+      <div class="card" style="text-align:center">
+        <div class="card-title">Tool Arsenal</div>
+        <p><strong style="color:#fff;font-size:22px;font-family:var(--head)">= Peripherals</strong><br>kali-mcp, Telegram, BloodHound — hardware the kernel talks to via MCP drivers.</p>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+      <div class="bquote" style="margin-bottom:0;font-size:clamp(16px,2vw,24px)">"We are no longer just running tools.<br>We are building autonomous systems that<br>navigate digital complexity at <span class="accent">machine speed.</span>"<div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:12px;letter-spacing:2px">— Autonomous Offensive Reasoning Research</div></div>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:3px;margin-bottom:14px">// WHAT THIS MEANS</div>
+        <ul class="blist" style="gap:14px">
+          <li>Autonomous offense is here — running on <strong>commodity hardware, today</strong></li>
+          <li>The operator is now the <strong>air traffic controller</strong> — not the pilot at the controls</li>
+          <li>The question is not <em>can AI attack</em> — it's <strong>who controls the AI doing the attacking</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 19 — BUILD YOUR OWN
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s19">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div class="slide-label">Section 7 — Close</div>
+  <div class="slide-title">How to <span class="accent">Build Your Own</span></div>
+  <div class="slide-sub">8 steps · commodity hardware · weekend project · everything is public</div>
+  <div class="content">
+    <div class="two-col" style="gap:24px">
+      <div>
+        <div class="card-title" style="margin-bottom:12px">Build Order</div>
+        <div class="sline"><span class="r">01</span> &nbsp;Proxmox + Kali VM (2 vCPU, 4GB RAM)</div>
+        <div class="sline hl"><span class="r">02</span> &nbsp;npm i -g opencode-ai → opencode available globally</div>
+        <div class="sline"><span class="r">03</span> &nbsp;kali-mcp: apt install mcp-kali-server (SSE :8000)</div>
+        <div class="sline hl"><span class="r">04</span> &nbsp;Ollama on laptop → ollama pull mistral</div>
+        <div class="sline"><span class="r">05</span> &nbsp;Wire kali-mcp as MCP in OpenCode config.json</div>
+        <div class="sline hl"><span class="r">06</span> &nbsp;Create aegis-x-agents.md → .opencode/agents/</div>
+        <div class="sline"><span class="r">07</span> &nbsp;systemctl enable opencode-web.service (:80)</div>
+        <div class="sline hl"><span class="r">08</span> &nbsp;Tab → red-operator → start session</div>
+        <div class="humor-box">⏱ Step 6 takes the longest. The agent is only as good as the doctrine you write for it.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <div class="card-title" style="margin-bottom:4px">Key Repos</div>
+        <div class="code" style="padding:10px 13px">npm i -g <span class="k">opencode-ai</span></div>
+        <div class="code" style="padding:10px 13px">apt install <span class="k">mcp-kali-server</span></div>
+        <div class="code" style="padding:10px 13px">opencode.ai/<span class="k">docs/agents/</span></div>
+        <div class="code" style="padding:10px 13px">github.com/<span class="k">ASCIT31/Dark-Moon</span></div>
+        <div class="card dark">
+          <div class="card-title">Minimum Hardware</div>
+          <p>Any machine with 16GB RAM · Proxmox ISO · GTX anything for Ollama · 1 afternoon of your time</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SLIDE 20 — FINAL
+════════════════════════════════════════════════════ -->
+<div class="slide" id="s20">
+  <div style="position:absolute;top:18px;right:56px;display:flex;align-items:center;gap:8px;z-index:10;pointer-events:none">
+    <canvas class="aegis-mini-canvas" width="32" height="32" style="flex-shrink:0"></canvas>
+    <div><div style="font-family:var(--head);font-size:14px;font-weight:900;color:#fff;letter-spacing:2px;line-height:1">AEGIS<span style="color:var(--red)">-X</span></div></div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="red-line" style="width:38px"></div>
+    <div class="final-scan-wrap"><div class="scan-line"></div><div class="bquote" style="font-size:clamp(19px,2.5vw,32px)">"The question is not whether this exists.<br>It does — right now, on commodity hardware,<br>in a home lab, running on a GTX 860M.<br><br>The question is: are you <span class="accent">building it</span>,<br>or waiting for someone else to<br>use it against your clients?"</div></div>
+    <div style="margin-top:22px;display:flex;gap:18px;align-items:center;margin-bottom:24px">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:3px">THANK YOU</div>
+      <div style="flex:1;height:1px;background:var(--border2)"></div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--red);letter-spacing:2px">Q &amp; A</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+      <div class="card" style="text-align:center"><div class="card-title">Web</div><p style="font-size:15px">mohammeddanishamber.com</p></div>
+      <div class="card" style="text-align:center"><div class="card-title">GitHub</div><p style="font-size:15px">github.com/mddanish</p></div>
+      <div class="card" style="text-align:center"><div class="card-title">LinkedIn</div><p style="font-size:15px">/mohammed-danish-amber</p></div>
+    </div>
+    <div style="margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--dim);text-align:center;letter-spacing:1px">// OpenCode Edition · aegis-x-agents.md · slides → mohammeddanishamber.com</div>
+  </div>
+</div>
+
+</div><!-- end #deck -->
+
+<div id="nav">
+  <div class="nleft">
+    <button class="nbtn" id="pb" disabled>◄ PREV</button>
+    <button class="nbtn" id="nb">NEXT ►</button>
+    <div id="pbar"><div id="pfill"></div></div>
+    <span id="ptxt">00 / 20</span>
+  </div>
+</div>
+
+</div><!-- end #app -->
+
+<script>
+/* ANIMATED BACKGROUND */
+(function(){
+  var c=document.getElementById('bg-canvas');
+  var ctx=c.getContext('2d');
+  var W,H,particles=[];
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+  for(var i=0;i<55;i++){
+    particles.push({
+      x:Math.random()*W,y:Math.random()*H,
+      vx:(Math.random()-0.5)*0.4,vy:(Math.random()-0.5)*0.4,
+      size:Math.random()*1.5+0.5,
+      alpha:Math.random()*0.7+0.3
+    });
+  }
+  var gridLines=[];
+  for(var g=0;g<8;g++){
+    gridLines.push({
+      x:Math.random()*W,
+      angle:Math.random()*Math.PI,
+      speed:(Math.random()-0.5)*0.15,
+      alpha:Math.random()*0.22+0.08,
+      len:Math.random()*200+100
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    gridLines.forEach(function(l){
+      l.x+=l.speed;
+      if(l.x<-200)l.x=W+200;
+      if(l.x>W+200)l.x=-200;
+      ctx.save();
+      ctx.translate(l.x,H/2);
+      ctx.rotate(l.angle);
+      ctx.strokeStyle='rgba(255,31,31,'+l.alpha+')';
+      ctx.lineWidth=0.5;
+      ctx.beginPath();
+      ctx.moveTo(-l.len,0);
+      ctx.lineTo(l.len,0);
+      ctx.stroke();
+      ctx.restore();
+    });
+    particles.forEach(function(p){
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,31,31,'+p.alpha+')';
+      ctx.fill();
+    });
+    for(var i=0;i<particles.length;i++){
+      for(var j=i+1;j<particles.length;j++){
+        var dx=particles[i].x-particles[j].x;
+        var dy=particles[i].y-particles[j].y;
+        var d=Math.sqrt(dx*dx+dy*dy);
+        if(d<140){
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x,particles[i].y);
+          ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.strokeStyle='rgba(255,31,31,'+(0.18*(1-d/140))+')';
+          ctx.lineWidth=0.6;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* SLIDE NAVIGATION */
+var sl=document.querySelectorAll('.slide');
+var pb=document.getElementById('pb');
+var nb=document.getElementById('nb');
+var pt=document.getElementById('ptxt');
+var pf=document.getElementById('pfill');
+var cur=0;
+var total=sl.length-1;
+
+function go(n){
+  sl[cur].classList.remove('active');
+  cur=Math.max(0,Math.min(total,n));
+  sl[cur].classList.add('active');
+  pb.disabled=(cur===0);
+  nb.disabled=(cur===total);
+  pt.textContent=cur.toString().padStart(2,'0')+' / '+total.toString().padStart(2,'0');
+  pf.style.width=(total>0?(cur/total*100):0)+'%';
+}
+
+pb.onclick=function(){go(cur-1);};
+nb.onclick=function(){go(cur+1);};
+document.onkeydown=function(e){
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')go(cur+1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')go(cur-1);
+  if(e.key==='Home')go(0);
+  if(e.key==='End')go(total);
+};
+/* Ensure clean initial state — CSS handles display via .active class */
+sl.forEach(function(s){ s.classList.remove('active'); });
+go(0);
+
+/* BloodHound mini-graph animation */
+(function(){
+  function initBHCanvas(){
+    var canvas = document.getElementById('bh-canvas');
+    if(!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var w = canvas.offsetWidth || 200;
+    var h = 70;
+    canvas.width = w;
+    canvas.height = h;
+    var nodes = [
+      {x:0.1,y:0.7,r:5,c:'#ff6b35',label:'Olivia'},
+      {x:0.3,y:0.3,r:4,c:'#0088cc'},
+      {x:0.5,y:0.6,r:4,c:'#0088cc'},
+      {x:0.7,y:0.2,r:4,c:'#0088cc'},
+      {x:0.85,y:0.7,r:6,c:'#ff1f1f',label:'DA'}
+    ];
+    var edges = [[0,1],[0,2],[1,3],[2,3],[3,4],[2,4]];
+    var t = 0;
+    function draw(){
+      ctx.clearRect(0,0,w,h);
+      edges.forEach(function(e){
+        var a=nodes[e[0]], b=nodes[e[1]];
+        ctx.beginPath();
+        ctx.moveTo(a.x*w, a.y*h);
+        ctx.lineTo(b.x*w, b.y*h);
+        ctx.strokeStyle='rgba(0,136,204,0.3)';
+        ctx.lineWidth=1;
+        ctx.stroke();
+      });
+      // animated data packet
+      var progress = (t % 120) / 120;
+      var ei = Math.floor((t/120) % edges.length);
+      var edge = edges[ei];
+      var a=nodes[edge[0]], b=nodes[edge[1]];
+      var px = a.x*w + (b.x*w - a.x*w)*progress;
+      var py = a.y*h + (b.y*h - a.y*h)*progress;
+      ctx.beginPath();
+      ctx.arc(px,py,2.5,0,Math.PI*2);
+      ctx.fillStyle='rgba(0,255,200,0.9)';
+      ctx.fill();
+      nodes.forEach(function(n, i){
+        var pulse = i===4 ? 1.5+Math.sin(t*0.08)*0.5 : 1;
+        ctx.beginPath();
+        ctx.arc(n.x*w, n.y*h, n.r*pulse, 0, Math.PI*2);
+        ctx.fillStyle = n.c;
+        ctx.fill();
+        if(n.label){
+          ctx.fillStyle='#fff';
+          ctx.font='8px monospace';
+          ctx.textAlign='center';
+          ctx.fillText(n.label, n.x*w, n.y*h - n.r - 2);
+        }
+      });
+      t++;
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+  // init when slide s12b becomes active
+  var observer = new MutationObserver(function(muts){
+    muts.forEach(function(m){
+      if(m.target.id==='s12b' && m.target.classList.contains('active')){
+        setTimeout(initBHCanvas, 300);
+        // trigger component fade-ins
+        ['comp-bh','comp-llm','comp-hv','flow-connector'].forEach(function(id){
+          var el=document.getElementById(id);
+          if(el){ el.style.opacity='1'; el.style.transform='translateY(0)'; }
+        });
+        for(var i=1;i<=7;i++){
+          (function(n){
+            var el=document.getElementById('cy'+n);
+            var ar=document.getElementById('ca'+n);
+            if(el){ el.style.opacity='1'; el.style.transform='translateY(0)'; }
+            if(ar){ ar.style.opacity='1'; }
+          })(i);
+        }
+      }
+    });
+  });
+  observer.observe(document.getElementById('s12b'), {attributes:true, attributeFilter:['class']});
+})();
+
+
+/* MCP signal canvas */
+(function(){
+  function initMCPCanvas(){
+    var c = document.getElementById('mcp-canvas');
+    if(!c) return;
+    var ctx = c.getContext('2d');
+    var w = c.offsetWidth, h = c.offsetHeight;
+    c.width = w; c.height = h;
+    var packets = [];
+    function spawnPacket(){
+      packets.push({ x: w*0.1, y: h*0.5, tx: w*0.9, ty: h*0.5, progress: 0, speed: 0.008 + Math.random()*0.006, color: ['#FF1F1F','#7ec8e3','#4caf50'][Math.floor(Math.random()*3)] });
+    }
+    setInterval(spawnPacket, 600);
+    function draw(){
+      ctx.clearRect(0,0,w,h);
+      // draw connection line
+      ctx.beginPath();
+      ctx.moveTo(w*0.1, h*0.5);
+      ctx.lineTo(w*0.9, h*0.5);
+      ctx.strokeStyle = 'rgba(255,31,31,0.15)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4,4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      packets = packets.filter(function(p){ return p.progress <= 1; });
+      packets.forEach(function(p){
+        p.progress += p.speed;
+        var x = p.x + (p.tx - p.x) * p.progress;
+        var y = p.y + (p.ty - p.y) * p.progress + Math.sin(p.progress * Math.PI * 4) * 6;
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI*2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      });
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+  // observe s07
+  var el7 = document.getElementById('s07');
+  if(el7){
+    var obs7 = new MutationObserver(function(m){ m.forEach(function(mu){ if(mu.target.classList.contains('active')) setTimeout(initMCPCanvas, 200); }); });
+    obs7.observe(el7, {attributes:true, attributeFilter:['class']});
+  }
+})();
+
+/* Typewriter on kill chain steps */
+(function(){
+  function typewriteChain(){
+    var steps = document.querySelectorAll('#s15 .chain-main');
+    steps.forEach(function(el, i){
+      var text = el.textContent;
+      el.textContent = '';
+      setTimeout(function(){
+        var j = 0;
+        var iv = setInterval(function(){
+          el.textContent = text.slice(0,j);
+          j++;
+          if(j > text.length) clearInterval(iv);
+        }, 18);
+      }, 300 + i * 400);
+    });
+  }
+  var el15 = document.getElementById('s15');
+  if(el15){
+    var obs15 = new MutationObserver(function(m){ m.forEach(function(mu){ if(mu.target.classList.contains('active')) typewriteChain(); }); });
+    obs15.observe(el15, {attributes:true, attributeFilter:['class']});
+  }
+})();
+
+
+
+
+
+/* ══ TITLE SLIDE ANIMATIONS ══ */
+(function(){
+
+  /* ── AEGIS-X LOGO CANVAS ── */
+  function drawAegis(){
+    var c = document.getElementById('aegis-canvas');
+    if(!c) return;
+    var ctx = c.getContext('2d');
+    var s = 52, cx = 26, cy = 26;
+    var t = 0;
+    function frame(){
+      ctx.clearRect(0,0,s,s);
+      // outer rotating hex ring
+      ctx.save();
+      ctx.translate(cx,cy);
+      ctx.rotate(t * 0.012);
+      for(var i=0;i<6;i++){
+        var a = (i/6)*Math.PI*2;
+        var x = Math.cos(a)*20, y = Math.sin(a)*20;
+        ctx.beginPath();
+        ctx.arc(x,y,2.5,0,Math.PI*2);
+        ctx.fillStyle = i%2===0 ? '#FF1F1F' : 'rgba(255,31,31,0.4)';
+        ctx.fill();
+      }
+      ctx.restore();
+      // inner shield shape
+      ctx.save();
+      ctx.translate(cx,cy);
+      ctx.rotate(-t*0.008);
+      // shield path
+      var sh = 13, sw = 10;
+      ctx.beginPath();
+      ctx.moveTo(0,-sh);
+      ctx.lineTo(sw,-sh*0.5);
+      ctx.lineTo(sw,sh*0.2);
+      ctx.quadraticCurveTo(0,sh*1.1,-sw,sh*0.2);  // fixed: removed extra 0
+      ctx.lineTo(-sw,-sh*0.5);
+      ctx.closePath();
+      ctx.strokeStyle = '#FF1F1F';
+      ctx.lineWidth = 1.5;
+      ctx.shadowBlur = 6 + Math.sin(t*0.05)*4;
+      ctx.shadowColor = '#FF1F1F';
+      ctx.stroke();
+      // X inside shield
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = 'rgba(255,31,31,0.7)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(-4,-4); ctx.lineTo(4,4);
+      ctx.moveTo(4,-4);  ctx.lineTo(-4,4);
+      ctx.stroke();
+      ctx.restore();
+      // pulse ring
+      var pr = 18 + Math.sin(t*0.04)*3;
+      ctx.beginPath();
+      ctx.arc(cx,cy,pr,0,Math.PI*2);
+      ctx.strokeStyle = 'rgba(255,31,31,'+(0.15+Math.sin(t*0.04)*0.1)+')';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+      t++;
+      requestAnimationFrame(frame);
+    }
+    frame();
+  }
+
+  /* ── LLM REASONING CYCLE CANVAS ── */
+  function drawLLMCycle(){
+    var c = document.getElementById('llm-cycle-canvas');
+    if(!c) return;
+    var W = c.offsetWidth, H = c.offsetHeight;
+    c.width = W; c.height = H;
+    var ctx = c.getContext('2d');
+    var t = 0;
+    // nodes: Think, Act, Observe arranged in a triangle
+    var cx = W/2, cy = H/2 - 4;
+    var r = Math.min(W,H)*0.32;
+    var nodes = [
+      { label:'THINK',   angle:-Math.PI/2,       color:'#FF1F1F' },
+      { label:'ACT',     angle:-Math.PI/2+Math.PI*2/3,   color:'#7ec8e3' },
+      { label:'OBSERVE', angle:-Math.PI/2+Math.PI*4/3,   color:'#4caf50' },
+    ];
+    var packetProgress = 0;
+    var packetEdge = 0;
+    function frame(){
+      ctx.clearRect(0,0,W,H);
+      // draw edges
+      for(var i=0;i<nodes.length;i++){
+        var a = nodes[i], b = nodes[(i+1)%nodes.length];
+        var ax = cx+Math.cos(a.angle)*r, ay = cy+Math.sin(a.angle)*r;
+        var bx = cx+Math.cos(b.angle)*r, by = cy+Math.sin(b.angle)*r;
+        ctx.beginPath();
+        ctx.moveTo(ax,ay); ctx.lineTo(bx,by);
+        ctx.strokeStyle = 'rgba(255,31,31,0.15)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3,4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      // draw nodes
+      nodes.forEach(function(n){
+        var nx = cx+Math.cos(n.angle)*r, ny = cy+Math.sin(n.angle)*r;
+        var glow = (packetEdge === nodes.indexOf(n)) ? 0.6+Math.sin(t*0.12)*0.2 : 0.15;
+        ctx.beginPath();
+        ctx.arc(nx,ny,14,0,Math.PI*2);
+        ctx.fillStyle = n.color.replace(')',','+glow+')').replace('rgb','rgba').replace('#','rgba('+parseInt(n.color.slice(1,3),16)+','+parseInt(n.color.slice(3,5),16)+','+parseInt(n.color.slice(5,7),16)+',');
+        // simpler approach:
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(nx,ny,14,0,Math.PI*2);
+        ctx.strokeStyle = n.color;
+        ctx.lineWidth = packetEdge === nodes.indexOf(n) ? 2 : 1;
+        ctx.shadowBlur = packetEdge === nodes.indexOf(n) ? 10 : 0;
+        ctx.shadowColor = n.color;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = n.color;
+        ctx.font = 'bold 7px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(n.label, nx, ny);
+      });
+      // draw packet on current edge
+      var a = nodes[packetEdge], b = nodes[(packetEdge+1)%nodes.length];
+      var ax = cx+Math.cos(a.angle)*r, ay = cy+Math.sin(a.angle)*r;
+      var bx = cx+Math.cos(b.angle)*r, by = cy+Math.sin(b.angle)*r;
+      var px = ax + (bx-ax)*packetProgress, py = ay + (by-ay)*packetProgress;
+      ctx.beginPath();
+      ctx.arc(px,py,4,0,Math.PI*2);
+      ctx.fillStyle = '#FF1F1F';
+      ctx.shadowBlur = 8; ctx.shadowColor='#FF1F1F';
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      // centre label
+      ctx.fillStyle = 'rgba(255,31,31,0.5)';
+      ctx.font = '8px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('AUTONOMOUS', cx, cy-6);
+      ctx.fillText('LOOP', cx, cy+6);
+      packetProgress += 0.018;
+      if(packetProgress >= 1){ packetProgress=0; packetEdge=(packetEdge+1)%nodes.length; }
+      t++;
+      requestAnimationFrame(frame);
+    }
+    frame();
+  }
+
+  /* ── RED TEAM ATTACK CYCLE CANVAS ── */
+  function drawRTCycle(){
+    var c = document.getElementById('rt-cycle-canvas');
+    if(!c) return;
+    var W = c.offsetWidth, H = c.offsetHeight;
+    c.width = W; c.height = H;
+    var ctx = c.getContext('2d');
+    var t = 0;
+    var cx = W/2, cy = H/2;
+    var r = Math.min(W,H)*0.34;
+    var steps = [
+      { label:'RECON',    color:'#7ec8e3' },
+      { label:'ENUM',     color:'#7ec8e3' },
+      { label:'EXPLOIT',  color:'#FF1F1F' },
+      { label:'PIVOT',    color:'#f0a500' },
+      { label:'ESCALATE', color:'#f0a500' },
+      { label:'REPORT',   color:'#4caf50' },
+    ];
+    var active = 0;
+    var progress = 0;
+    setInterval(function(){ progress+=0.022; if(progress>=1){progress=0;active=(active+1)%steps.length;} },16);
+    function frame(){
+      ctx.clearRect(0,0,W,H);
+      var n = steps.length;
+      // draw circle
+      ctx.beginPath();
+      ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.strokeStyle='rgba(240,165,0,0.1)';
+      ctx.lineWidth=1;
+      ctx.stroke();
+      // draw step nodes
+      steps.forEach(function(s,i){
+        var ang = -Math.PI/2 + (i/n)*Math.PI*2;
+        var x = cx+Math.cos(ang)*r, y = cy+Math.sin(ang)*r;
+        var isActive = i===active;
+        var isNext = i===(active+1)%n;
+        ctx.beginPath(); ctx.arc(x,y,13,0,Math.PI*2);
+        ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fill();
+        ctx.beginPath(); ctx.arc(x,y,13,0,Math.PI*2);
+        ctx.strokeStyle= isActive ? s.color : 'rgba(255,255,255,0.1)';
+        ctx.lineWidth= isActive ? 2 : 1;
+        ctx.shadowBlur= isActive ? 12 : 0;
+        ctx.shadowColor= s.color;
+        ctx.stroke(); ctx.shadowBlur=0;
+        ctx.fillStyle= isActive ? s.color : '#444';
+        ctx.font='bold 6px monospace';
+        ctx.textAlign='center';
+        ctx.textBaseline='middle';
+        ctx.fillText(s.label, x, y);
+        // draw edge to next
+        var ang2 = -Math.PI/2 + ((i+1)/n)*Math.PI*2;
+        var x2 = cx+Math.cos(ang2)*r, y2 = cy+Math.sin(ang2)*r;
+        ctx.beginPath();
+        ctx.moveTo(x,y); ctx.lineTo(x2,y2);
+        ctx.strokeStyle= i===active ? s.color.replace('#','rgba(').replace('rgb','rgba')+'0.4)' : 'rgba(255,255,255,0.05)';
+        ctx.strokeStyle= i===active ? 'rgba(240,165,0,0.35)' : 'rgba(255,255,255,0.05)';
+        ctx.lineWidth=1; ctx.setLineDash([2,4]); ctx.stroke(); ctx.setLineDash([]);
+      });
+      // moving packet on active edge
+      var a = steps[active], ang_a = -Math.PI/2+(active/n)*Math.PI*2;
+      var ang_b = -Math.PI/2+((active+1)/n)*Math.PI*2;
+      var x1=cx+Math.cos(ang_a)*r, y1=cy+Math.sin(ang_a)*r;
+      var x2=cx+Math.cos(ang_b)*r, y2=cy+Math.sin(ang_b)*r;
+      var px=x1+(x2-x1)*progress, py=y1+(y2-y1)*progress;
+      ctx.beginPath(); ctx.arc(px,py,3.5,0,Math.PI*2);
+      ctx.fillStyle='#f0a500';
+      ctx.shadowBlur=8; ctx.shadowColor='#f0a500';
+      ctx.fill(); ctx.shadowBlur=0;
+      // centre
+      ctx.fillStyle='rgba(240,165,0,0.5)';
+      ctx.font='8px monospace';
+      ctx.textAlign='center';
+      ctx.fillText('KILL CHAIN', cx, cy-6);
+      ctx.fillText('LOOP', cx, cy+6);
+      t++;
+      requestAnimationFrame(frame);
+    }
+    frame();
+  }
+
+  /* ── INIT on slide s01 becoming active ── */
+  var s01 = document.getElementById('s01');
+  var inited = false;
+  function initAll(){
+    if(inited) return;
+    inited = true;
+    drawAegis();
+    setTimeout(drawLLMCycle, 50);
+    setTimeout(drawRTCycle, 80);
+  }
+  if(s01){
+    var obs = new MutationObserver(function(m){
+      m.forEach(function(mu){ if(mu.target.classList.contains('active')) initAll(); });
+    });
+    obs.observe(s01,{attributes:true,attributeFilter:['class']});
+    // also init if already active on load
+    if(s01.classList.contains('active')) initAll();
+  }
+  // init on first go(0) call — s01 may be slide index 1
+  document.addEventListener('keydown', function(){ setTimeout(function(){ if(document.getElementById('s01').classList.contains('active')) initAll(); },50); });
+})();
+
+
+/* Aegis-X mini logo — animate all instances */
+(function(){
+  function drawMini(c){
+    if(!c || c.dataset.running) return;
+    c.dataset.running = '1';
+    var ctx = c.getContext('2d');
+    var s = 32, cx = 16, cy = 16, t = 0;
+    function frame(){
+      ctx.clearRect(0,0,s,s);
+      // rotating hex dots
+      ctx.save();
+      ctx.translate(cx,cy);
+      ctx.rotate(t*0.014);
+      for(var i=0;i<6;i++){
+        var a=(i/6)*Math.PI*2;
+        ctx.beginPath();
+        ctx.arc(Math.cos(a)*11,Math.sin(a)*11,1.6,0,Math.PI*2);
+        ctx.fillStyle=i%2===0?'#FF1F1F':'rgba(255,31,31,0.35)';
+        ctx.fill();
+      }
+      ctx.restore();
+      // shield
+      ctx.save();
+      ctx.translate(cx,cy);
+      ctx.rotate(-t*0.009);
+      ctx.beginPath();
+      ctx.moveTo(0,-8); ctx.lineTo(6,-4);
+      ctx.lineTo(6,2);
+      ctx.quadraticCurveTo(0,10,-6,2);
+      ctx.lineTo(-6,-4);
+      ctx.closePath();
+      ctx.strokeStyle='#FF1F1F';
+      ctx.lineWidth=1.2;
+      ctx.shadowBlur=4+Math.sin(t*0.06)*2;
+      ctx.shadowColor='#FF1F1F';
+      ctx.stroke();
+      // X
+      ctx.shadowBlur=0;
+      ctx.strokeStyle='rgba(255,31,31,0.6)';
+      ctx.lineWidth=0.9;
+      ctx.beginPath();
+      ctx.moveTo(-2.5,-2.5); ctx.lineTo(2.5,2.5);
+      ctx.moveTo(2.5,-2.5);  ctx.lineTo(-2.5,2.5);
+      ctx.stroke();
+      ctx.restore();
+      t++;
+      requestAnimationFrame(frame);
+    }
+    frame();
+  }
+
+  // Start animations for all visible mini canvases
+  // and watch for new slides becoming active
+  function startVisible(){
+    document.querySelectorAll('.aegis-mini-canvas').forEach(function(c){
+      var slide = c.closest('.slide');
+      if(slide && slide.classList.contains('active')) drawMini(c);
+    });
+  }
+
+  // Observe all slides for class changes
+  document.querySelectorAll('.slide').forEach(function(slide){
+    var obs = new MutationObserver(function(){
+      if(slide.classList.contains('active')){
+        var c = slide.querySelector('.aegis-mini-canvas');
+        if(c) drawMini(c);
+      }
+    });
+    obs.observe(slide,{attributes:true,attributeFilter:['class']});
+  });
+
+  // Also start for whichever is active on load
+  setTimeout(startVisible, 200);
+})();
+
+
+/* Aegis-X logo on s00 */
+(function(){
+  function drawAegisS00(){
+    var c = document.getElementById('aegis-canvas-s00');
+    if(!c || c.dataset.running) return;
+    c.dataset.running='1';
+    var ctx=c.getContext('2d'), s=44, cx=22, cy=22, t=0;
+    function frame(){
+      ctx.clearRect(0,0,s,s);
+      ctx.save(); ctx.translate(cx,cy); ctx.rotate(t*0.013);
+      for(var i=0;i<6;i++){
+        var a=(i/6)*Math.PI*2;
+        ctx.beginPath(); ctx.arc(Math.cos(a)*14,Math.sin(a)*14,2,0,Math.PI*2);
+        ctx.fillStyle=i%2===0?'#FF1F1F':'rgba(255,31,31,0.3)'; ctx.fill();
+      }
+      ctx.restore();
+      ctx.save(); ctx.translate(cx,cy); ctx.rotate(-t*0.009);
+      ctx.beginPath(); ctx.moveTo(0,-9); ctx.lineTo(7,-5); ctx.lineTo(7,2);
+      ctx.quadraticCurveTo(0,11,-7,2); ctx.lineTo(-7,-5); ctx.closePath();
+      ctx.strokeStyle='#FF1F1F'; ctx.lineWidth=1.4;
+      ctx.shadowBlur=5+Math.sin(t*0.06)*3; ctx.shadowColor='#FF1F1F'; ctx.stroke();
+      ctx.shadowBlur=0; ctx.strokeStyle='rgba(255,31,31,0.6)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(-3,-3); ctx.lineTo(3,3); ctx.moveTo(3,-3); ctx.lineTo(-3,3); ctx.stroke();
+      ctx.restore();
+      t++; requestAnimationFrame(frame);
+    }
+    frame();
+  }
+  var s00=document.getElementById('s00');
+  if(s00){
+    var obs=new MutationObserver(function(m){ m.forEach(function(mu){ if(mu.target.classList.contains('active')) drawAegisS00(); }); });
+    obs.observe(s00,{attributes:true,attributeFilter:['class']});
+    if(s00.classList.contains('active')) drawAegisS00();
+  }
+})();
+
+/* EDR Evasion Cycle */
+(function(){
+  function drawEDRCycle(){
+    var c=document.getElementById('edr-cycle-canvas');
+    if(!c||c.dataset.running) return;
+    c.dataset.running='1';
+    var W=c.offsetWidth, H=c.offsetHeight;
+    c.width=W; c.height=H;
+    var ctx=c.getContext('2d'), t=0;
+    var cx=W/2, cy=H/2, r=Math.min(W,H)*0.33;
+    var steps=[
+      {label:'DETECT',  color:'#cc3333'},
+      {label:'EVADE',   color:'#7ec8e3'},
+      {label:'OBFUSC',  color:'#7ec8e3'},
+      {label:'INJECT',  color:'#f0a500'},
+    ];
+    var active=0, progress=0;
+    setInterval(function(){ progress+=0.022; if(progress>=1){progress=0;active=(active+1)%steps.length;} },16);
+    function frame(){
+      ctx.clearRect(0,0,W,H);
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.strokeStyle='rgba(126,200,227,0.08)'; ctx.lineWidth=1; ctx.stroke();
+      steps.forEach(function(s,i){
+        var ang=-Math.PI/2+(i/steps.length)*Math.PI*2;
+        var x=cx+Math.cos(ang)*r, y=cy+Math.sin(ang)*r;
+        var isA=i===active;
+        ctx.beginPath(); ctx.arc(x,y,13,0,Math.PI*2);
+        ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fill();
+        ctx.strokeStyle=isA?s.color:'rgba(126,200,227,0.15)';
+        ctx.lineWidth=isA?2:1; ctx.shadowBlur=isA?10:0; ctx.shadowColor=s.color;
+        ctx.stroke(); ctx.shadowBlur=0;
+        ctx.fillStyle=isA?s.color:'#444'; ctx.font='bold 6px monospace';
+        ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(s.label,x,y);
+        var ang2=-Math.PI/2+((i+1)/steps.length)*Math.PI*2;
+        var x2=cx+Math.cos(ang2)*r, y2=cy+Math.sin(ang2)*r;
+        ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x2,y2);
+        ctx.strokeStyle=isA?'rgba(126,200,227,0.3)':'rgba(255,255,255,0.04)';
+        ctx.lineWidth=1; ctx.setLineDash([2,4]); ctx.stroke(); ctx.setLineDash([]);
+      });
+      var ang_a=-Math.PI/2+(active/steps.length)*Math.PI*2;
+      var ang_b=-Math.PI/2+((active+1)/steps.length)*Math.PI*2;
+      var x1=cx+Math.cos(ang_a)*r,y1=cy+Math.sin(ang_a)*r;
+      var x2=cx+Math.cos(ang_b)*r,y2=cy+Math.sin(ang_b)*r;
+      var px=x1+(x2-x1)*progress,py=y1+(y2-y1)*progress;
+      ctx.beginPath(); ctx.arc(px,py,3.5,0,Math.PI*2);
+      ctx.fillStyle='#7ec8e3'; ctx.shadowBlur=8; ctx.shadowColor='#7ec8e3';
+      ctx.fill(); ctx.shadowBlur=0;
+      ctx.fillStyle='rgba(126,200,227,0.45)'; ctx.font='8px monospace';
+      ctx.textAlign='center'; ctx.fillText('EDR',cx,cy-6); ctx.fillText('BYPASS',cx,cy+6);
+      t++; requestAnimationFrame(frame);
+    }
+    frame();
+  }
+  var s01=document.getElementById('s01');
+  if(s01){
+    var obs=new MutationObserver(function(m){ m.forEach(function(mu){ if(mu.target.classList.contains('active')) setTimeout(drawEDRCycle,120); }); });
+    obs.observe(s01,{attributes:true,attributeFilter:['class']});
+    if(s01.classList.contains('active')) setTimeout(drawEDRCycle,120);
+  }
+})();
+
+/* Operator Control Loop */
+(function(){
+  function drawOpCycle(){
+    var c=document.getElementById('op-cycle-canvas');
+    if(!c||c.dataset.running) return;
+    c.dataset.running='1';
+    var W=c.offsetWidth, H=c.offsetHeight;
+    c.width=W; c.height=H;
+    var ctx=c.getContext('2d'), t=0;
+    var cx=W/2, cy=H/2;
+    // Linear pipeline: PLAN→TASK→EXECUTE→REVIEW→REPORT
+    var steps=['PLAN','TASK','EXEC','REVIEW','REPORT'];
+    var colors=['#4caf50','#7ec8e3','#FF1F1F','#f0a500','#4caf50'];
+    var active=0, progress=0;
+    setInterval(function(){ progress+=0.02; if(progress>=1){progress=0;active=(active+1)%steps.length;} },16);
+    function frame(){
+      ctx.clearRect(0,0,W,H);
+      var n=steps.length;
+      var boxW=Math.min(28,(W-20)/n), spacing=W/n;
+      // draw connections
+      for(var i=0;i<n-1;i++){
+        var x1=spacing*i+spacing/2, x2=spacing*(i+1)+spacing/2;
+        ctx.beginPath(); ctx.moveTo(x1,cy); ctx.lineTo(x2,cy);
+        ctx.strokeStyle=i===active?'rgba(76,175,80,0.4)':'rgba(255,255,255,0.05)';
+        ctx.lineWidth=1; ctx.setLineDash([2,4]); ctx.stroke(); ctx.setLineDash([]);
+      }
+      // draw nodes
+      steps.forEach(function(s,i){
+        var x=spacing*i+spacing/2;
+        var isA=i===active;
+        ctx.beginPath(); ctx.arc(x,cy,12,0,Math.PI*2);
+        ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fill();
+        ctx.strokeStyle=isA?colors[i]:'rgba(76,175,80,0.2)';
+        ctx.lineWidth=isA?2:1; ctx.shadowBlur=isA?10:0; ctx.shadowColor=colors[i];
+        ctx.stroke(); ctx.shadowBlur=0;
+        ctx.fillStyle=isA?colors[i]:'#444';
+        ctx.font='bold 6px monospace'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(s,x,cy);
+        // label below
+        ctx.fillStyle=isA?'rgba(76,175,80,0.6)':'rgba(255,255,255,0.1)';
+        ctx.font='5px monospace'; ctx.fillText((i+1)+'',x,cy+22);
+      });
+      // packet on active edge
+      if(active < n-1){
+        var x1=spacing*active+spacing/2, x2=spacing*(active+1)+spacing/2;
+        var px=x1+(x2-x1)*progress;
+        ctx.beginPath(); ctx.arc(px,cy,3.5,0,Math.PI*2);
+        ctx.fillStyle='#4caf50'; ctx.shadowBlur=8; ctx.shadowColor='#4caf50';
+        ctx.fill(); ctx.shadowBlur=0;
+      } else {
+        // loop back arrow hint
+        ctx.fillStyle='rgba(76,175,80,0.4)';
+        ctx.font='9px monospace'; ctx.textAlign='center';
+        ctx.fillText('↺',cx,cy-24);
+      }
+      t++; requestAnimationFrame(frame);
+    }
+    frame();
+  }
+  var s01=document.getElementById('s01');
+  if(s01){
+    var obs=new MutationObserver(function(m){ m.forEach(function(mu){ if(mu.target.classList.contains('active')) setTimeout(drawOpCycle,150); }); });
+    obs.observe(s01,{attributes:true,attributeFilter:['class']});
+    if(s01.classList.contains('active')) setTimeout(drawOpCycle,150);
+  }
+})();
+
+
+/* ── Demo Architecture Animated Flow ── */
+(function(){
+  function initArch(){
+    var c = document.getElementById('arch-canvas');
+    if(!c || c.dataset.running) return;
+    c.dataset.running = '1';
+    var W, H;
+    function resize(){
+      W = c.offsetWidth; H = c.offsetHeight;
+      c.width = W; c.height = H;
+    }
+    resize();
+
+    var t = 0;
+    var packets = [];
+
+    // Define nodes: [id, label, sublabel, x%, y%, color, width%]
+    var nodes = [
+      { id:'laptop',   label:'LAPTOP',        sub:'Ollama · GTX 860M',  xp:0.18, yp:0.10, col:'#666666', w:160, h:48 },
+      { id:'oc',       label:'OpenCode LXC',  sub:'/usr/bin/opencode · :80', xp:0.18, yp:0.40, col:'#FF1F1F', w:160, h:48 },
+      { id:'kali',     label:'Kali Linux VM', sub:'kali-mcp SSE :8000', xp:0.18, yp:0.72, col:'#4caf50', w:160, h:48 },
+      { id:'htb',      label:'HackTheBox',    sub:'10.10.x.x · tun0',   xp:0.72, yp:0.72, col:'#9fef00', w:160, h:48 },
+    ];
+
+    // Edges: [from, to, label, color]
+    var edges = [
+      { from:'laptop', to:'oc',   label:'inference',         col:'#FF1F1F' },
+      { from:'oc',     to:'kali', label:'MCP SSE :8000',     col:'#7ec8e3' },
+      { from:'kali',   to:'htb',  label:'OpenVPN tun0',      col:'#9fef00' },
+    ];
+
+    // Spawn a packet on an edge
+    function spawnPacket(){
+      var e = edges[Math.floor(Math.random()*edges.length)];
+      packets.push({ edge: e, progress: 0, speed: 0.008 + Math.random()*0.006 });
+    }
+    setInterval(spawnPacket, 700);
+
+    function getNode(id){ return nodes.find(function(n){return n.id===id;}); }
+
+    function nodePos(n){
+      return { x: n.xp * W, y: n.yp * H };
+    }
+
+    function drawBox(ctx, n, glow){
+      var p = nodePos(n);
+      var x = p.x - n.w/2, y = p.y - n.h/2;
+      // Shadow glow
+      if(glow){
+        ctx.shadowBlur = 16; ctx.shadowColor = n.col;
+      } else {
+        ctx.shadowBlur = 4; ctx.shadowColor = n.col;
+      }
+      // Box bg
+      ctx.fillStyle = 'rgba(10,10,10,0.85)';
+      ctx.beginPath();
+      ctx.roundRect(x, y, n.w, n.h, 6);
+      ctx.fill();
+      // Box border
+      ctx.strokeStyle = n.col;
+      ctx.lineWidth = glow ? 2 : 1;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      // Label
+      ctx.fillStyle = n.col;
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(n.label, p.x, p.y - 8);
+      // Sub
+      ctx.fillStyle = '#666';
+      ctx.font = '9px monospace';
+      ctx.fillText(n.sub, p.x, p.y + 9);
+    }
+
+    function draw(){
+      ctx.clearRect(0, 0, W, H);
+
+      // Draw edges first
+      edges.forEach(function(e){
+        var a = getNode(e.from), b = getNode(e.to);
+        var ax = a.xp*W, ay = a.yp*H + a.h/2;
+        var bx = b.xp*W, by = b.yp*H - b.h/2;
+        // For kali→htb: horizontal
+        if(e.from === 'kali' && e.to === 'htb'){
+          ax = a.xp*W + a.w/2; ay = a.yp*H;
+          bx = b.xp*W - b.w/2; by = b.yp*H;
+        }
+        // Line
+        ctx.beginPath();
+        ctx.moveTo(ax, ay); ctx.lineTo(bx, by);
+        ctx.strokeStyle = e.col.replace(')', ',0.25)').replace('#', 'rgba('+parseInt(e.col.slice(1,3),16)+','+parseInt(e.col.slice(3,5),16)+','+parseInt(e.col.slice(5,7),16)+',');
+        // simpler:
+        ctx.strokeStyle = 'rgba(100,100,100,0.3)';
+        ctx.setLineDash([4,4]);
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.setLineDash([]);
+        // Arrow head at b
+        var ang = Math.atan2(by-ay, bx-ax);
+        var al = 8;
+        ctx.beginPath();
+        ctx.moveTo(bx, by);
+        ctx.lineTo(bx - al*Math.cos(ang-0.4), by - al*Math.sin(ang-0.4));
+        ctx.lineTo(bx - al*Math.cos(ang+0.4), by - al*Math.sin(ang+0.4));
+        ctx.closePath();
+        ctx.fillStyle = e.col;
+        ctx.fill();
+        // Edge label midpoint
+        var mx = (ax+bx)/2, my = (ay+by)/2;
+        ctx.fillStyle = 'rgba(200,200,200,0.5)';
+        ctx.font = '8px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(e.label, mx + (e.from==='kali'?0:18), my + (e.from==='kali'?-10:0));
+      });
+
+      // Draw nodes
+      nodes.forEach(function(n){
+        // Is a packet near this node?
+        var glow = packets.some(function(p){
+          return (p.edge.from === n.id && p.progress < 0.15) ||
+                 (p.edge.to   === n.id && p.progress > 0.85);
+        });
+        drawBox(ctx, n, glow);
+      });
+
+      // Draw packets
+      packets = packets.filter(function(p){ return p.progress <= 1; });
+      packets.forEach(function(p){
+        p.progress += p.speed;
+        var a = getNode(p.edge.from), b = getNode(p.edge.to);
+        var ax = a.xp*W, ay = a.yp*H + a.h/2;
+        var bx = b.xp*W, by = b.yp*H - b.h/2;
+        if(p.edge.from === 'kali' && p.edge.to === 'htb'){
+          ax = a.xp*W + a.w/2; ay = a.yp*H;
+          bx = b.xp*W - b.w/2; by = b.yp*H;
+        }
+        var px = ax + (bx-ax)*p.progress;
+        var py = ay + (by-ay)*p.progress;
+        ctx.beginPath();
+        ctx.arc(px, py, 4, 0, Math.PI*2);
+        ctx.fillStyle = p.edge.col;
+        ctx.shadowBlur = 8; ctx.shadowColor = p.edge.col;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      t++;
+      requestAnimationFrame(draw);
+    }
+
+    var ctx = c.getContext('2d');
+    draw();
+
+    // Resize on slide activate
+    var s14b = document.getElementById('s14b');
+    if(s14b){
+      new MutationObserver(function(ms){ ms.forEach(function(m){
+        if(m.target.classList.contains('active')){ setTimeout(function(){ resize(); },100); }
+      }); }).observe(s14b, {attributes:true, attributeFilter:['class']});
+    }
+  }
+
+  // Init when s14b becomes active
+  var el = document.getElementById('s14b');
+  if(el){
+    new MutationObserver(function(ms){ ms.forEach(function(m){
+      if(m.target.classList.contains('active')) initArch();
+    }); }).observe(el, {attributes:true, attributeFilter:['class']});
+    if(el.classList.contains('active')) initArch();
+  }
+})();
+
+</script>
+
+
+</body>
+</html  </div>
+>
