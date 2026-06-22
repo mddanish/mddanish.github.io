@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intel Blog — Classified Research | Mohammed Danish Amber</title>
+  <meta name="description" content="Access Mohammed Danish Amber's threat intelligence, EDR evasion research, custom exploit chains, malware analysis logs, and zero-trust engineering playbooks." />
+  <meta property="og:title" content="Intel Blog | Mohammed Danish Amber" />
+  <meta property="og:description" content="Tactical security advisories, custom payload design updates, and proactive control-validation research." />
+  <meta property="og:type" content="website" />
+  <link rel="canonical" href="https://www.mohammeddanishamber.com/blog.html" />
+
+  <!-- Favicon placeholder using a cyber SVG -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23FF1F1F%22>⬡</text></svg>" />
+
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Marked.js for parsing Markdown to HTML -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    /* Custom blog specific styles */
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+    @media (max-width: 768px) {
+      .blog-grid { grid-template-columns: 1fr; }
+    }
+    .blog-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      transition: all var(--transition-base);
+    }
+    .blog-card:hover {
+      border-color: var(--glass-border-red);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-red-sm);
+    }
+    .blog-meta {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      font-family: var(--font-tech);
+      font-size: .65rem;
+      color: var(--steel-muted);
+      letter-spacing: .05em;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+    .blog-category {
+      color: var(--core-red);
+      font-weight: 700;
+    }
+    .blog-post-content {
+      font-family: var(--font-body);
+      font-size: .95rem;
+      line-height: 1.85;
+      color: var(--steel-muted);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .blog-post-content a {
+      color: var(--core-red);
+      font-weight: 500;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(255, 31, 31, 0.4);
+      transition: all var(--transition-fast);
+    }
+    .blog-post-content a:hover {
+      color: var(--white);
+      border-bottom-color: var(--white);
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+    }
+    .blog-post-content h1, 
+    .blog-post-content h2, 
+    .blog-post-content h3 {
+      font-family: var(--font-display);
+      color: var(--white);
+      font-weight: 700;
+      margin: 2.25rem 0 1rem;
+      letter-spacing: .02em;
+    }
+    .blog-post-content h1 { font-size: 2rem; border-bottom: 1px solid var(--glass-border); padding-bottom: .75rem; }
+    .blog-post-content h2 { font-size: 1.45rem; }
+    .blog-post-content h3 { font-size: 1.2rem; }
+    .blog-post-content p { margin-bottom: 1.5rem; }
+    .blog-post-content ul, 
+    .blog-post-content ol {
+      margin-bottom: 1.5rem;
+      padding-left: 1.5rem;
+    }
+    .blog-post-content li {
+      margin-bottom: .5rem;
+      list-style-type: square;
+    }
+    .blog-post-content li strong {
+      color: var(--white);
+    }
+    .blog-post-content pre {
+      background: rgba(5, 5, 5, 0.95);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: .85rem;
+      color: #22c55e;
+      line-height: 1.6;
+    }
+    .blog-post-content code {
+      background: rgba(255, 31, 31, 0.08);
+      border: 1px solid rgba(255, 31, 31, 0.15);
+      padding: .2rem .4rem;
+      border-radius: 4px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: .85rem;
+      color: var(--white);
+    }
+    .blog-post-content pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+    }
+    .blog-post-content hr {
+      border: 0;
+      height: 1px;
+      background: var(--glass-border);
+      margin: 2rem 0;
+    }
+    .blog-post-content blockquote {
+      border-left: 3px solid var(--core-red);
+      background: rgba(255, 31, 31, 0.02);
+      padding: 1rem 1.5rem;
+      margin: 1.5rem 0;
+      font-style: italic;
+      color: var(--titanium-silver);
+    }
+    .blog-post-header {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 3rem;
+      border-bottom: 1px solid var(--glass-border);
+      padding-bottom: 2rem;
+    }
+    .blog-post-tags {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    #blog-loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      font-family: var(--font-tech);
+      color: var(--core-red);
+      font-size: .85rem;
+      letter-spacing: .1em;
+    }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 2px solid rgba(255,31,31,0.1);
+      border-top-color: var(--core-red);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 1rem;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .briefing-card {
+      height: auto;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      border-radius: var(--radius-lg);
+    }
+    .briefing-card:hover {
+      border-color: var(--glass-border-red);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-red-sm);
+    }
+    @keyframes pulse-amber {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+      50% { opacity: 0.6; box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+    }
+
+    /* Page hero for blog (standalone page, not anchored section) */
+    .page-hero {
+      padding: 10rem 0 4rem;
+      position: relative;
+    }
+    .page-hero h1 {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: .02em;
+      color: var(--white);
+    }
+    @media (max-width: 768px) {
+      .page-hero h1 { font-size: 2rem; }
+      .page-hero { padding: 8rem 0 3rem; }
+    }
+  </style>
+</head>
+<body>
+<canvas id="cyber-canvas" aria-hidden="true"></canvas>
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<nav class="nav" role="navigation" aria-label="Main Navigation">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo" aria-label="Danish Amber Home">
+      <span class="nav-logo-icon">⬢</span>
+      <span class="nav-logo-text">M. DANISH<span> AMBER</span></span>
+    </a>
+
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="index.html#about" class="nav-link">About</a>
+      <a href="index.html#experience" class="nav-link">Experience</a>
+      <a href="index.html#skills" class="nav-link">Skills</a>
+      <a href="index.html#certifications" class="nav-link">Credentials</a>
+      <a href="blog.html" class="nav-link active">Blog</a>
+      <a href="index.html#contact" class="nav-link">Contact</a>
+    </div>
+
+    <button class="nav-hamburger" aria-label="Toggle Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="nav-mobile-menu">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="index.html#about" class="nav-link">About</a>
+    <a href="index.html#experience" class="nav-link">Experience</a>
+    <a href="index.html#skills" class="nav-link">Skills</a>
+    <a href="index.html#certifications" class="nav-link">Credentials</a>
+    <a href="blog.html" class="nav-link active">Blog</a>
+    <a href="index.html#contact" class="nav-link">Contact</a>
+  </div>
+</nav>
+
+<!-- PAGE HERO (DYNAMIC TITLE) -->
+<header class="page-hero" id="blog-hero" style="background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(255,31,31,0.08),transparent);">
+  <div class="container text-center fade-up">
+    <div class="chip" id="hero-chip">Classified Intel Feed</div>
+    <h1 id="hero-title">Operational Intel &amp;<br /><span class="highlight">Exploit Research</span></h1>
+    <p id="hero-subtitle" style="color:var(--steel-muted);max-width:600px;margin:1.5rem auto 0;font-size:1.05rem;line-height:1.8;">
+      Tactical security advisories, custom payload design updates, and proactive control-validation research logs.
+    </p>
+  </div>
+</header>
+
+<!-- ============================================================
+     BLOG CONTENT SECTION (DYNAMIC LIST OR VIEW)
+     ============================================================ -->
+<section class="section">
+  <div class="container">
+    
+    <!-- Loader element shown during fetch operations -->
+    <div id="blog-loader" style="display: none;">
+      <div class="spinner"></div>
+      <div>ESTABLISHING DECRYPTED FEED...</div>
+    </div>
+
+    <!-- 1. Blog Post Grid List Container -->
+    <div id="blog-list-view">
+      <div class="blog-grid" id="blog-posts-container">
+        <!-- Rendered dynamically by JS engine -->
+      </div>
+
+      <!-- Briefings & Publications Section -->
+      <div style="margin-top: 5rem; border-top: 1px solid var(--glass-border); padding-top: 4rem; margin-bottom: 2rem;">
+        <h2 style="font-family: var(--font-display); color: var(--white); font-size: 1.8rem; margin: 0 0 0.5rem; letter-spacing: 0.03em; text-transform: uppercase;">
+          Briefings &amp; Publications
+        </h2>
+        <p style="color: var(--steel-muted); font-size: 0.95rem; line-height: 1.8; max-width: 600px; margin-bottom: 2.5rem;">
+          Keynote addresses, technical research papers, and public security disclosures delivered at global cybersecurity conferences.
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr; gap: 2rem;">
+          <!-- Briefing Card 1 -->
+          <div class="glass-card briefing-card fade-up visible" style="padding: 2.5rem; border-left: 3px solid var(--core-red); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; transition: all var(--transition-base); min-height: 250px;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+                <span class="chip" style="margin-bottom: 0; padding: 0.2rem 0.6rem; font-size: 0.65rem;">Keynote Briefing</span>
+                <span style="font-family: var(--font-tech); font-size: 0.65rem; color: #f59e0b; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 0.2rem 0.6rem; border-radius: var(--radius-full); display: inline-flex; align-items: center; gap: 0.4rem; letter-spacing: 0.05em; text-transform: uppercase;">
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; display: inline-block; animation: pulse-amber 1.5s infinite;"></span>
+                  Schedule Postponed / Rescheduled
+                </span>
+              </div>
+              <h3 style="font-size: 1.45rem; margin: 0 0 0.5rem; color: var(--white); font-family: var(--font-display); line-height: 1.3;">
+                The Agentic Operator: Automating Adversarial Reasoning with Local AI
+              </h3>
+              <div style="font-family: var(--font-tech); font-size: 0.7rem; color: var(--steel-muted); margin-bottom: 1.5rem; letter-spacing: 0.05em;">
+                HACKEXPO 2026 — PRESENTED BY CYBER SOCIETY (MSIT) | KOLKATA, INDIA
+              </div>
+              <p style="color: var(--steel-muted); font-size: 0.95rem; line-height: 1.8; margin-bottom: 1.5rem; max-width: 900px;">
+                Mohammed Danish Amber will deliver a technical keynote demonstrating how locally hosted, sovereign LLM orchestration can automate multi-stage adversary reasoning. Moving beyond static chat wrappers, the briefing outlines a framework for deploying autonomous red-team swarms that dynamically discover vulnerabilities, refactor exploit code, and bypass modern EDR platforms in air-gapped enterprise environments.
+              </p>
+              <div style="border-left: 2px solid #f59e0b; background: rgba(245, 158, 11, 0.02); padding: 0.75rem 1.25rem; border-radius: 0 var(--radius-md) var(--radius-md) 0; margin-bottom: 1.5rem; max-width: 900px;">
+                <p style="color: #f59e0b; font-size: 0.85rem; line-height: 1.6; margin: 0; font-weight: 500;">
+                  ⚠️ SCHEDULE UPDATE: Originally slated for an upcoming date in Kolkata, this briefing has been officially postponed due to scheduling realignments. The updated date and venue details will be published here as soon as they are finalized.
+                </p>
+              </div>
+            </div>
+            <div>
+              <a href="https://www.linkedin.com/feed/update/urn:li:activity:7454452701427359744/" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="width: fit-content; border: 1px solid rgba(255, 31, 31, 0.3);">
+                Official Speaker Announcement ↗
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Single Post Viewer Container -->
+    <div id="blog-post-view" style="display: none;">
+      <div style="margin-bottom: 2.5rem; display: flex; justify-content: flex-start;">
+        <a href="blog.html" class="btn btn-ghost btn-sm" id="btn-back-feed">
+          ← Back to Intel Feed
+        </a>
+      </div>
+      
+      <article class="glass-card" style="padding: 3rem 2.5rem;">
+        <div class="blog-post-header">
+          <div class="blog-meta" style="justify-content: center;">
+            <span class="blog-category" id="post-category">Category</span>
+            <span>•</span>
+            <span id="post-date">Date</span>
+            <span>•</span>
+            <span id="post-readtime">Time</span>
+          </div>
+          <h2 style="font-size: 2.2rem; margin: 0 0 1rem; font-family: var(--font-display); line-height: 1.3;" id="post-title">Post Title</h2>
+          <div style="font-family:var(--font-tech); font-size:.7rem; color:var(--steel-muted); margin-bottom: 1.5rem;">
+            BY <span style="color:var(--white);" id="post-author">Author</span>
+          </div>
+          <div class="blog-post-tags" style="justify-content: center;" id="post-tags">
+            <!-- Tags rendered here -->
+          </div>
+        </div>
+        
+        <div class="blog-post-content" id="post-markdown-render">
+          <!-- Rendered HTML Markdown output -->
+        </div>
+      </article>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div>
+      <div class="nav-logo" style="margin-bottom:0.5rem;">
+        <span class="nav-logo-icon">⬢</span>
+        <span class="nav-logo-text" style="font-size:0.9rem;">M. DANISH<span> AMBER</span></span>
+      </div>
+      <p style="font-size:12px;">© 2026 Mohammed Danish Amber. All rights reserved. Managed under personal domain protocols.</p>
+    </div>
+
+    <!-- Social channels -->
+    <div class="footer-socials">
+      <a href="https://www.linkedin.com/in/mohammed-danish-amber/" target="_blank" rel="noopener" class="footer-social" aria-label="LinkedIn" title="Connect on LinkedIn">in</a>
+      <a href="https://github.com/mddanish" target="_blank" rel="noopener" class="footer-social" aria-label="GitHub" title="Visit GitHub Workspace">⌥</a>
+      <a href="mailto:me@mohammeddanishamber.com" class="footer-social" aria-label="Email" title="Send Secure Email">✉</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="blogs-data.js"></script>
+<script src="app.js"></script>
+
+<!-- ============================================================
+     CLIENT-SIDE DYNAMIC BLOG ROUTING ENGINE
+     ============================================================ -->
+<script>
+  (function() {
+    'use strict';
+
+    const loader = document.getElementById('blog-loader');
+    const listView = document.getElementById('blog-list-view');
+    const postView = document.getElementById('blog-post-view');
+    const postsContainer = document.getElementById('blog-posts-container');
+
+    // DOM Hook elements for single post
+    const postCategory = document.getElementById('post-category');
+    const postDate = document.getElementById('post-date');
+    const postReadTime = document.getElementById('post-readtime');
+    const postTitle = document.getElementById('post-title');
+    const postAuthor = document.getElementById('post-author');
+    const postTags = document.getElementById('post-tags');
+    const postMarkdownRender = document.getElementById('post-markdown-render');
+
+    // DOM Hero elements to alter dynamically
+    const heroTitle = document.getElementById('hero-title');
+    const heroSubtitle = document.getElementById('hero-subtitle');
+    const heroChip = document.getElementById('hero-chip');
+
+    // Parse URL query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const postSlug = urlParams.get('post');
+
+    // Show loading spinner
+    function showLoading(show) {
+      loader.style.display = show ? 'flex' : 'none';
+      if (show) {
+        listView.style.display = 'none';
+        postView.style.display = 'none';
+      }
+    }
+
+    // Load Blog Database and Route
+    showLoading(true);
+    const blogs = window.BLOGS_DATA || [];
+    
+    if (blogs.length === 0) {
+      showLoading(false);
+      postsContainer.innerHTML = `
+        <div class="glass-card" style="grid-column: 1 / -1; padding: 3rem; text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: 1rem;">⚠️</div>
+          <h3 style="margin-bottom: 0.5rem; color: var(--core-red);">Database Connection Terminated</h3>
+          <p style="color: var(--steel-muted); font-size: 0.9rem;">Could not establish link to intel repository. Check blogs-data.js integration.</p>
+        </div>
+      `;
+      listView.style.display = 'block';
+    } else {
+      if (postSlug) {
+        // Render Single Post Mode
+        const activePost = blogs.find(b => b.slug === postSlug);
+        if (activePost) {
+          renderSinglePost(activePost);
+        } else {
+          // Post slug not found, fall back to listing
+          window.history.replaceState({}, document.title, 'blog.html');
+          renderList(blogs);
+        }
+      } else {
+        // Render List Grid Mode
+        renderList(blogs);
+      }
+    }
+
+    // Render list grid of all blogs
+    function renderList(blogs) {
+      showLoading(false);
+      listView.style.display = 'block';
+      postView.style.display = 'none';
+
+      // Set standard headers
+      document.title = "Intel Blog — Classified Research | Mohammed Danish Amber";
+      heroChip.textContent = "Classified Intel Feed";
+      heroTitle.innerHTML = `Operational Intel &amp;<br /><span class="highlight">Exploit Research</span>`;
+      heroSubtitle.textContent = "Tactical security advisories, custom payload design updates, and proactive control-validation research logs.";
+
+      postsContainer.innerHTML = blogs.map(post => `
+        <div class="glass-card blog-card fade-up visible" style="padding: 2.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="blog-meta">
+              <span class="blog-category">${post.category}</span>
+              <span>•</span>
+              <span>${post.date}</span>
+              <span>•</span>
+              <span>${post.readTime}</span>
+            </div>
+            <h3 style="font-size: 1.35rem; margin: 0 0 1rem; color: var(--white); font-family: var(--font-display); line-height: 1.4;">
+              ${post.title}
+            </h3>
+            <p style="color: var(--steel-muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1.5rem;">
+              ${post.excerpt}
+            </p>
+          </div>
+          <div>
+            <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+              ${post.tags.map(t => `<span class="tag" style="font-size: 8px;">${t}</span>`).join('')}
+            </div>
+            <a href="blog.html?post=${post.slug}" class="btn btn-ghost btn-sm" style="width: fit-content;">
+              Read Research Dossier →
+            </a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Render single blog post using local Markdown string and marked.js
+    function renderSinglePost(post) {
+      // Set single post dynamic headers
+      document.title = `${post.title} | Intel Blog | Mohammed Danish Amber`;
+      
+      postCategory.textContent = post.category;
+      postDate.textContent = post.date;
+      postReadTime.textContent = post.readTime;
+      postTitle.textContent = post.title;
+      postAuthor.textContent = post.author.toUpperCase();
+      
+      postTags.innerHTML = post.tags.map(t => `<span class="tag" style="font-size: 8px;">${t}</span>`).join('');
+
+      try {
+        // Parse raw Markdown directly to rich HTML using marked.js
+        const parsedHtml = marked.parse(post.content || '');
+        
+        // Remove the first h1 title from markdown since we display it natively in the header block
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = parsedHtml;
+        const firstH1 = tempDiv.querySelector('h1');
+        if (firstH1) firstH1.remove();
+
+        postMarkdownRender.innerHTML = tempDiv.innerHTML;
+        
+        // Show the Single Post view
+        showLoading(false);
+        listView.style.display = 'none';
+        postView.style.display = 'block';
+
+        // Set dynamic hero content
+        heroChip.textContent = `Security Advisory // ${post.category}`;
+        heroTitle.innerHTML = `Classified<br /><span class="highlight">Research Dossier</span>`;
+        heroSubtitle.textContent = `Read absolute technical advisory regarding ${post.tags.slice(0,2).join(' & ')} details.`;
+      } catch (err) {
+        console.error(err);
+        showLoading(false);
+        postMarkdownRender.innerHTML = `
+          <div style="padding: 2rem; text-align: center; font-family: var(--font-tech); color: var(--core-red);">
+            [ERR_TRANSMISSION_CORRUPTED] // Could not decrypt or load raw markdown data.
+          </div>
+        `;
+        listView.style.display = 'none';
+        postView.style.display = 'block';
+      }
+    }
+
+    // Custom smooth scroll intercept on back-to-feed clicks
+    document.getElementById('btn-back-feed').addEventListener('click', function(e) {
+      e.preventDefault();
+      // Instantly change state back without refreshing
+      window.history.pushState({}, document.title, 'blog.html');
+      
+      // Rerender list dynamically
+      showLoading(true);
+      setTimeout(() => {
+        renderList(window.BLOGS_DATA || []);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 100);
+    });
+
+  })();
+</script>
+</body>
+</html>
