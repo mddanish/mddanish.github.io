@@ -1,0 +1,742 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>PHP2SHELL Explained</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* Layout: single reading column; sticky console header; tabbed CVE deep-dives; interactive version checker. */
+  :root{
+    /* Deck theme: near-black, red accent, Barlow + Share Tech Mono (single dark theme) */
+    --bg:#080808; --surface:#101010; --surface-2:#181818;
+    --fg:#ececec; --muted:#777777; --border:#252525;
+    --crit:#ff1f1f; --warn:#f0a500; --ok:#4caf50; --accent:#ff1f1f;
+    --crit-bg:#1c0707; --warn-bg:#211903; --ok-bg:#0d2a0d; --accent-bg:#1c0707;
+    --mono:"Share Tech Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:"Barlow",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --head:"Barlow Condensed","Barlow",system-ui,sans-serif;
+    color-scheme:dark;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --bg:#080808; --surface:#101010; --surface-2:#181818;
+    --fg:#ececec; --muted:#777777; --border:#252525;
+    --crit:#ff1f1f; --warn:#f0a500; --ok:#4caf50; --accent:#ff1f1f;
+    --crit-bg:#1c0707; --warn-bg:#211903; --ok-bg:#0d2a0d; --accent-bg:#1c0707;
+    color-scheme:dark;
+  }}
+  :root[data-theme="dark"]{
+    --bg:#080808; --surface:#101010; --surface-2:#181818;
+    --fg:#ececec; --muted:#777777; --border:#252525;
+    --crit:#ff1f1f; --warn:#f0a500; --ok:#4caf50; --accent:#ff1f1f;
+    --crit-bg:#1c0707; --warn-bg:#211903; --ok-bg:#0d2a0d; --accent-bg:#1c0707;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--fg);font-family:var(--sans);line-height:1.55;font-size:15px}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:20;background:var(--surface)}
+  h1,h2,h3{text-wrap:balance;line-height:1.08;margin:0;font-family:var(--head);letter-spacing:-0.4px}
+  code,kbd,.mono{font-family:var(--mono)}
+  a{color:var(--accent)}
+  .wrap{max-width:860px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+  /* header */
+  header{position:sticky;top:env(safe-area-inset-top,0px);z-index:21;background:var(--surface);border-bottom:1px solid var(--border)}
+  .hbar{display:flex;align-items:center;gap:12px;padding-block:12px}
+  .hbar .mark{font-family:var(--mono);font-weight:700;letter-spacing:.02em;font-size:15px}
+  .hbar .mark b{color:var(--crit)}
+  .sev{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--crit);background:var(--crit-bg);border:1px solid var(--crit);border-radius:4px;padding:2px 7px;letter-spacing:.04em}
+  .spacer{flex:1}
+  .tbtn{font-family:var(--mono);font-size:12px;color:var(--muted);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;cursor:pointer}
+  .tbtn:hover{color:var(--fg)}
+
+  /* hero */
+  .hero{padding-block:34px 10px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .hero h1{font-size:clamp(30px,8vw,52px);font-weight:700;margin-top:10px;letter-spacing:-.01em}
+  .hero h1 b{color:var(--crit);font-weight:700}
+  .thesis{font-size:clamp(16px,3.4vw,19px);color:var(--fg);max-width:60ch;margin-top:14px}
+  .cves{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .cve-chip{font-family:var(--mono);font-size:12px;border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:5px 12px;color:var(--fg)}
+
+  .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-block:26px}
+  .fact{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;min-width:0}
+  .fact .k{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .fact .v{font-size:19px;font-weight:700;margin-top:6px;font-variant-numeric:tabular-nums}
+  .fact .v.crit{color:var(--crit)}
+  @media(max-width:640px){.facts{grid-template-columns:repeat(2,1fr)}}
+
+  section{padding-block:22px}
+  .seclabel{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+  h2{font-size:clamp(21px,5vw,27px);font-weight:700;margin-bottom:14px}
+  p{margin:0 0 12px}
+
+  /* version checker */
+  .checker{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
+  .checker label{font-family:var(--mono);font-size:12px;color:var(--muted);display:block;margin-bottom:8px}
+  .crow{display:flex;gap:8px;flex-wrap:wrap}
+  .crow input{flex:1;min-width:140px;font-family:var(--mono);font-size:15px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--fg)}
+  .crow input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .crow button{font-family:var(--mono);font-size:14px;font-weight:600;padding:10px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer}
+  .verdict{margin-top:14px;border-radius:9px;padding:13px 15px;font-size:14px;display:none}
+  .verdict.show{display:block}
+  .verdict .vh{font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}
+  .v-crit{background:var(--crit-bg);border:1px solid var(--crit)}.v-crit .vh{color:var(--crit)}
+  .v-warn{background:var(--warn-bg);border:1px solid var(--warn)}.v-warn .vh{color:var(--warn)}
+  .v-ok{background:var(--ok-bg);border:1px solid var(--ok)}.v-ok .vh{color:var(--ok)}
+  .examples{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:10px}
+  .examples b{color:var(--fg);cursor:pointer;border-bottom:1px dotted var(--muted)}
+
+  /* tabs */
+  .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .tab{flex:1;min-width:220px;text-align:left;font-family:var(--mono);font-size:13px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer}
+  .tab b{display:block;color:var(--fg);font-size:14px;margin-bottom:3px}
+  .tab[aria-selected="true"]{border-color:var(--crit);background:var(--crit-bg)}
+  .tab[aria-selected="true"] b{color:var(--crit)}
+  .panel[hidden]{display:none}
+  .panel .kv{display:grid;grid-template-columns:140px 1fr;gap:4px 16px;font-size:14px;margin:14px 0;border:1px solid var(--border);border-radius:10px;padding:14px;background:var(--surface)}
+  .panel .kv dt{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.03em}
+  .panel .kv dd{margin:0}
+  @media(max-width:520px){.panel .kv{grid-template-columns:1fr;gap:2px}.panel .kv dd{margin-bottom:8px}}
+
+  /* lifecycle pipeline */
+  .pipe-title{font-family:var(--mono);font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:18px 0 10px}
+  .pipe{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface)}
+  .step{display:flex;gap:12px;padding:13px 15px;border-bottom:1px solid var(--border)}
+  .step:last-child{border-bottom:0}
+  .step .n{font-family:var(--mono);font-size:12px;color:var(--muted);flex:none;width:20px;font-weight:700}
+  .step .txt{font-size:14px;min-width:0}
+  .step .txt b{font-family:var(--mono);font-size:13px}
+  .step.fault{background:var(--crit-bg)}
+  .step.fault .n{color:var(--crit)}
+  .step.fault .txt b{color:var(--crit)}
+  .step.exec{background:var(--warn-bg)}
+  .step.exec .n{color:var(--warn)}
+
+  /* flow walkthrough */
+  .flow{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+  .flow-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:16px}
+  .grp{display:flex;gap:6px;align-items:center}
+  .grp .lbl{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .seg{font-family:var(--mono);font-size:12px;padding:6px 11px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer}
+  .seg[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
+  .spacer-f{flex:1;min-width:0}
+  .playbtn{font-family:var(--mono);font-size:13px;font-weight:600;padding:7px 14px;border-radius:7px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer}
+  .ghost{font-family:var(--mono);font-size:13px;padding:7px 12px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:var(--fg);cursor:pointer}
+  .netwrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--bg)}
+  svg.net{width:100%;height:auto;min-width:580px;display:block}
+  .edge{stroke:var(--border);stroke-width:2;fill:none}
+  .edge.breach{stroke-dasharray:5 5}
+  .edge.flow-on{stroke:var(--accent);stroke-width:3;stroke-dasharray:6 6;animation:dash 1s linear infinite}
+  @keyframes dash{to{stroke-dashoffset:-24}}
+  @media (prefers-reduced-motion:reduce){.edge.flow-on{animation:none}}
+  .gnode{cursor:pointer}
+  .gnode rect{fill:var(--surface);stroke:var(--border);stroke-width:1.5}
+  .gnode .gt{font-family:var(--mono);font-size:9px;fill:var(--muted);letter-spacing:.06em}
+  .gnode .gn{font-size:12px;font-weight:600;fill:var(--fg)}
+  .gnode.sel rect{stroke:var(--accent);stroke-width:2.5}
+  .gnode.active rect,.gnode.done rect{stroke:var(--accent);fill:var(--accent-bg)}
+  .gnode.fault.active rect,.gnode.fault.done rect{stroke:var(--crit);fill:var(--crit-bg)}
+  .gnode.fault.active .gt,.gnode.fault.done .gt{fill:var(--crit)}
+  .gnode.outcome.active rect,.gnode.outcome.done rect{stroke:var(--warn);fill:var(--warn-bg)}
+  .gnode.outcome.active .gt,.gnode.outcome.done .gt{fill:var(--warn)}
+  #pkt{transition:transform .6s ease}
+  #pkt.no-anim{transition:none}
+  #pkt circle{fill:var(--accent);stroke:var(--surface);stroke-width:2}
+  .reuse{font-family:var(--mono);font-size:10px;fill:var(--crit)}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:12px;height:12px;border-radius:3px;display:inline-block;border:1px solid}
+  .lg-path{background:var(--accent-bg);border-color:var(--accent)}
+  .lg-fault{background:var(--crit-bg);border-color:var(--crit)}
+  .lg-out{background:var(--warn-bg);border-color:var(--warn)}
+  .roleSel{font-family:var(--mono);font-size:12px;padding:6px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:var(--fg);cursor:pointer}
+  .lens{border:1px solid var(--accent);background:var(--accent-bg);border-radius:10px;padding:13px 15px;margin-bottom:14px}
+  .lens .lh{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+  .lens .lf{font-size:14px;font-weight:600;margin-bottom:8px}
+  .lens ul{margin:0;padding-left:18px;font-size:13.5px}
+  .lens li{margin-bottom:5px}
+  .narration{font-size:14px;margin-top:14px;border-left:3px solid var(--accent);background:var(--accent-bg);border-radius:0 8px 8px 0;padding:10px 14px}
+  .narration .st{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+   .flow-detail{margin-top:12px;border:1px dashed var(--border);border-radius:10px;padding:12px 14px;font-size:14px}
+   .flow-detail .dh{font-family:var(--mono);font-size:12px;font-weight:700;margin-bottom:5px}
+
+   /* incident-response drill */
+   .drill{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
+   .drill-top{display:flex;gap:16px;align-items:start;justify-content:space-between;margin-bottom:16px}
+   .drill-top h3{font-size:18px;margin-bottom:4px}
+   .drill-top p{font-size:14px;color:var(--muted);margin:0;max-width:56ch}
+   .score{flex:none;min-width:118px;text-align:center;border:1px solid var(--accent);background:var(--accent-bg);border-radius:9px;padding:8px 10px;font-family:var(--mono)}
+   .score b{display:block;font-size:21px;color:var(--accent);line-height:1.1}.score span{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+   .missions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+   .mission{border:1px solid var(--border);border-radius:10px;padding:14px;background:var(--bg)}
+   .mission.done{border-color:var(--ok);background:var(--ok-bg)}
+   .mission .mh{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+   .mission .num{display:inline-grid;place-items:center;width:20px;height:20px;border:1px solid var(--border);border-radius:50%;font-size:11px;color:var(--fg)}
+   .mission.done .num{background:var(--ok);border-color:var(--ok);color:#fff}
+   .mission p{font-size:14px;margin-bottom:10px}
+   .choices{display:flex;flex-wrap:wrap;gap:6px}.choice{font:600 12px var(--mono);padding:7px 9px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--fg);cursor:pointer;text-align:left}
+   .choice:hover,.choice:focus-visible{border-color:var(--accent);outline:0}.choice[disabled]{cursor:default;opacity:.65}
+   .mission-feedback{display:none;margin-top:10px;font-size:12.5px;line-height:1.45}.mission-feedback.show{display:block}.mission-feedback.good{color:var(--ok)}.mission-feedback.retry{color:var(--crit)}
+   .drill-summary{display:none;margin-top:14px;border-radius:8px;padding:10px 12px;background:var(--ok-bg);border:1px solid var(--ok);font-size:13px}.drill-summary.show{display:block}
+   @media(max-width:720px){.missions{grid-template-columns:1fr}.drill-top{align-items:center}.score{min-width:98px}}
+
+  /* mitigation table */
+  .tscroll{overflow-x:auto;border:1px solid var(--border);border-radius:12px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--surface-2)}
+  tr:last-child td{border-bottom:0}
+  td code{background:var(--surface-2);padding:1px 5px;border-radius:4px;font-size:12.5px}
+  .pill{font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+  .pill.only{color:var(--ok);background:var(--ok-bg);border:1px solid var(--ok)}
+  .pill.temp{color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn)}
+
+  .note{border-left:3px solid var(--accent);background:var(--accent-bg);border-radius:0 8px 8px 0;padding:12px 15px;font-size:14px;margin:12px 0}
+  .note b{color:var(--accent)}
+  .callout{border:1px solid var(--crit);background:var(--crit-bg);border-radius:10px;padding:14px 16px;font-size:14px}
+  .callout b{color:var(--crit)}
+
+  ul.tight{margin:0 0 12px;padding-left:22px;list-style:none}ul.tight li{margin-bottom:6px;position:relative}ul.tight li::before{content:'//';position:absolute;left:-18px;top:2px;color:var(--accent);font-family:var(--mono);font-size:11px}
+  .sources{font-size:13px;color:var(--muted)}
+  .sources a{display:inline-block;margin-right:6px}
+  footer{border-top:1px solid var(--border);margin-top:20px;padding-block:22px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+  .disc{font-size:12px;color:var(--muted);margin-top:8px}
+  .rule-card{margin:14px 0}
+  .rl{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);display:block;margin-bottom:6px}
+  .rl .rt{color:var(--muted);font-weight:400;text-transform:none;margin-left:6px}
+  pre.rule{overflow-x:auto;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:12px 14px;margin:0;font-family:var(--mono);font-size:12.5px;line-height:1.5;color:var(--fg)}
+  pre.rule .cm{color:var(--muted)}
+</style>
+
+<header>
+  <div class="wrap hbar">
+    <span class="mark">php<b>2</b>shell</span>
+    <span class="sev">CVSS 9.2 · CRITICAL</span>
+    <span class="spacer"></span>
+    <button class="tbtn" id="themeBtn" aria-label="Toggle theme">theme</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">PHP Core · disclosed 21 Oct 2026</div>
+    <h1>PHP<b>2</b>SHELL</h1>
+    <p class="thesis">Two memory-safety bugs in the PHP interpreter's request lifecycle. Both let an unauthenticated attacker reach remote code execution with the web worker's privileges — the out-of-memory path (…618) before your application code even runs, and the stale-state path (…619) by reusing a worker across requests.</p>
+    <div class="cves">
+      <span class="cve-chip">CVE-2026-109618 · OOM corruption</span>
+      <span class="cve-chip">CVE-2026-109619 · cross-request UAF</span>
+    </div>
+  </div>
+
+  <div class="facts">
+    <div class="fact"><div class="k">Severity</div><div class="v crit">9.2</div></div>
+    <div class="fact"><div class="k">Auth needed</div><div class="v crit">None</div></div>
+    <div class="fact"><div class="k">Patched</div><div class="v">21 Oct</div></div>
+    <div class="fact"><div class="k">Exploited since</div><div class="v crit">17 Oct</div></div>
+  </div>
+
+  <div class="callout">
+    <b>Active exploitation.</b> Amazon Threat Intelligence observed exploitation attempts starting 17 Oct 2026 — four days before public disclosure. Apache <code>mod_php</code> is the highest-risk configuration because the fault is reachable before application code runs. Patch out of your normal cycle.
+  </div>
+
+  <section>
+    <div class="seclabel">// check</div>
+    <h2>Are you affected?</h2>
+    <p>Enter the exact PHP version on the target. Logic runs entirely in your browser.</p>
+    <div class="checker">
+      <label for="ver">PHP version</label>
+      <div class="crow">
+        <input id="ver" class="mono" placeholder="e.g. 8.3.21" autocomplete="off" spellcheck="false">
+        <button id="checkBtn">Check</button>
+      </div>
+      <div class="examples">try:
+        <b data-v="8.3.21">8.3.21</b>
+        <b data-v="8.4.27">8.4.27</b>
+        <b data-v="8.1.30">8.1.30</b>
+        <b data-v="7.2.34">7.2.34</b>
+      </div>
+      <div class="verdict" id="verdict" role="status" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="seclabel">// the two flaws</div>
+    <h2>How each bug works</h2>
+    <p>Both are classic memory-safety faults, reached through ordinary request handling. The mechanism below is conceptual — enough to understand reachability and impact, not a recipe.</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab1" aria-selected="true" aria-controls="p1">
+        <b>CVE-2026-109618</b>Memory corruption during out-of-memory handling
+      </button>
+      <button class="tab" role="tab" id="tab2" aria-selected="false" aria-controls="p2">
+        <b>CVE-2026-109619</b>Use-after-free across requests (stale global state)
+      </button>
+    </div>
+
+    <div class="panel" id="p1" role="tabpanel" aria-labelledby="tab1">
+      <dl class="kv">
+        <dt>Class</dt><dd>Memory corruption (heap)</dd>
+        <dt>Trigger</dt><dd>Allocation failure while per-request data is only partly initialized</dd>
+        <dt>Attack vector</dt><dd>Network, unauthenticated. Crafted multipart requests can exhaust memory while appearing within configured limits.</dd>
+        <dt>Impact</dt><dd>RCE as the web worker; confirmed from PHP 5.4.0 onward</dd>
+        <dt>Highest risk</dt><dd><code>mod_php</code> — fault reachable before app code</dd>
+      </dl>
+      <div class="pipe-title">Where it goes wrong</div>
+      <div class="pipe">
+        <div class="step"><span class="n">1</span><div class="txt"><b>Request arrives.</b> PHP begins allocating internal structures for the request body.</div></div>
+        <div class="step"><span class="n">2</span><div class="txt"><b>Memory runs out.</b> An allocation fails mid-way, leaving request data half-initialized.</div></div>
+        <div class="step fault"><span class="n">3</span><div class="txt"><b>Cleanup runs anyway.</b> The teardown path treats the incomplete structures as if fully valid — reading and freeing fields that were never set up.</div></div>
+        <div class="step exec"><span class="n">4</span><div class="txt"><b>Corruption.</b> Operating on that invalid state corrupts the heap, which an attacker who controls the layout can steer toward code execution.</div></div>
+      </div>
+      <div class="note"><b>Why limits don't save you:</b> <code>RLIMIT_AS</code> / <code>RLIMIT_DATA</code> can actually <em>trigger</em> the vulnerable path. Container and cgroup caps help availability but are not a complete fix.</div>
+      <div class="note"><b>Known OOM shapes:</b> public research demonstrates oversized multipart fields, header amplification across many parts, and deeply nested empty-file controls. They are useful detection signals, not a substitute for patching.</div>
+    </div>
+
+    <div class="panel" id="p2" role="tabpanel" aria-labelledby="tab2" hidden>
+      <dl class="kv">
+        <dt>Class</dt><dd>Use-after-free (cross-request)</dd>
+        <dt>Trigger</dt><dd>Leftover global state references memory freed at the end of an earlier request</dd>
+        <dt>Confirmed paths</dt><dd>Session upload-progress (on by default); fatal-error backtraces (PHP 8.5)</dd>
+        <dt>Attack vector</dt><dd>Network, unauthenticated. Worker reuse + an interrupted cleanup (fatal error or timeout).</dd>
+        <dt>Impact</dt><dd>RCE as the web worker; memory disclosure also confirmed</dd>
+        <dt>Affected models</dt><dd>Both <code>mod_php</code> and PHP-FPM</dd>
+      </dl>
+      <div class="pipe-title">Where it goes wrong</div>
+      <div class="pipe">
+        <div class="step"><span class="n">1</span><div class="txt"><b>Request A runs</b> on a pooled worker and leaves some global state behind.</div></div>
+        <div class="step"><span class="n">2</span><div class="txt"><b>Cleanup is interrupted</b> by a fatal error or timeout, so the normal reset never fully clears that state.</div></div>
+        <div class="step fault"><span class="n">3</span><div class="txt"><b>Memory is freed</b> but a stale global pointer still refers to it. The worker stays alive for reuse.</div></div>
+        <div class="step exec"><span class="n">4</span><div class="txt"><b>Request B lands</b> on the same worker and touches the stale pointer before init clears it — using freed memory an attacker can have reallocated.</div></div>
+      </div>
+      <div class="note"><b>Silence is not safety:</b> suppressing diagnostics (<code>error_reporting</code>, <code>display_errors</code>, <code>@</code>) does not stop stale-state access. Absent log entries do not prove an installation is safe.</div>
+    </div>
+
+    <div class="pipe-title" style="margin-top:22px">The five exploit chains</div>
+    <p style="margin-top:4px">Public analysis maps the two CVEs to five concrete chains — one OOM path (…618) and four stale-state paths (…619). Each has a different precondition and runtime surface.</p>
+    <div class="tscroll">
+      <table>
+        <thead><tr><th>Chain</th><th>CVE</th><th>Vector</th><th>Pre-auth</th><th>Precondition</th><th>SAPI</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">A</td><td class="mono">…619</td><td>Session injection + LFI</td><td>yes</td><td>Application has an LFI sink</td><td>all</td></tr>
+          <tr><td class="mono">B</td><td class="mono">…619</td><td><code>var_destroy</code> UAF → handler overwrite</td><td>no</td><td>Application calls <code>unserialize()</code></td><td>all</td></tr>
+          <tr><td class="mono">C</td><td class="mono">…619</td><td>Handler mismatch → <code>__destruct</code></td><td>yes</td><td>Two directories use different <code>serialize_handler</code> values</td><td>FPM</td></tr>
+          <tr><td class="mono">D</td><td class="mono">…618</td><td>OOM corruption → stale <code>EG()</code></td><td>yes</td><td>None — any endpoint</td><td>mod_php</td></tr>
+          <tr><td class="mono">E</td><td class="mono">…619</td><td>FPM session OOM → stale <code>BG()</code></td><td>yes</td><td>Producer calls <code>session_start()</code></td><td>FPM</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note"><b>Chain D is the headline.</b> It needs no application feature, LFI, or <code>unserialize()</code> — only a reachable <code>mod_php</code> worker. The other chains depend on application behavior or FPM-specific configuration.</div>
+  </section>
+
+  <section>
+    <div class="seclabel">// walkthrough</div>
+    <h2>Attack path on a real stack</h2>
+    <p>Where the request travels across a typical PHP deployment, and where each flaw bites. Pick a flaw, choose detail level, then <b>Play</b> or click any component.</p>
+    <div class="flow">
+      <div class="flow-controls">
+        <div class="grp"><span class="lbl">flaw</span>
+          <button class="seg" data-sc="618" aria-pressed="true">…618 OOM</button>
+          <button class="seg" data-sc="619" aria-pressed="false">…619 UAF</button>
+        </div>
+        <div class="grp"><span class="lbl">audience</span>
+          <select class="roleSel" id="roleSel" aria-label="Audience role">
+            <option value="exec">Higher management</option>
+            <option value="ntm">Non-tech manager</option>
+            <option value="mgr">Manager</option>
+            <option value="tmg">Tech manager</option>
+            <option value="analyst">Security analyst</option>
+            <option value="dev">Developer</option>
+            <option value="researcher">Security researcher</option>
+          </select>
+        </div>
+        <span class="spacer-f"></span>
+        <div class="grp">
+          <button class="playbtn" id="flowPlay">▶ Play</button>
+          <button class="ghost" id="flowStep">Step</button>
+          <button class="ghost" id="flowReset">Reset</button>
+        </div>
+      </div>
+      <div class="lens" id="flowLens"></div>
+      <div class="netwrap"><div id="flowSvg"></div></div>
+      <div class="legend">
+        <span><i class="lg-path"></i> request path</span>
+        <span><i class="lg-fault"></i> fault location</span>
+        <span><i class="lg-out"></i> impact</span>
+        <span>dashed = breach</span>
+      </div>
+      <div class="narration" id="flowNarr" role="status" aria-live="polite"></div>
+      <div class="flow-detail" id="flowDetail"></div>
+    </div>
+  </section>
+
+   <section>
+     <div class="seclabel">// remediation</div>
+     <h2>Fix &amp; mitigations</h2>
+    <p>Updating is the only complete remediation for both flaws. Temporary mitigations reduce exposure but do not remove the underlying fault — and every config change needs a full worker restart to take effect.</p>
+    <div class="tscroll">
+      <table>
+        <thead><tr><th>Branch</th><th>Patched release</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">8.5.x</td><td class="mono">8.5.12</td><td><span class="pill only">supported</span></td></tr>
+          <tr><td class="mono">8.4.x</td><td class="mono">8.4.27</td><td><span class="pill only">supported</span></td></tr>
+          <tr><td class="mono">8.3.x</td><td class="mono">8.3.36</td><td><span class="pill only">supported</span></td></tr>
+          <tr><td class="mono">8.2.x</td><td class="mono">8.2.35</td><td><span class="pill only">supported</span></td></tr>
+          <tr><td class="mono">7.4 – 8.1</td><td class="mono">source backport</td><td><span class="pill temp">no binary release</span></td></tr>
+          <tr><td class="mono">5.4 – 7.3</td><td class="mono">— none —</td><td><span class="pill temp">EOL · no fix</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pipe-title" style="margin-top:22px">If you cannot patch immediately</div>
+    <div class="tscroll">
+      <table>
+        <thead><tr><th>CVE</th><th>Temporary mitigation</th><th>Applied where</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">…618</td><td>Enforce <code>memory_limit=-1</code> so apps cannot override it</td><td>php.ini (admin), then restart workers</td></tr>
+          <tr><td class="mono">…618</td><td>Bound <code>post_max_size</code>, <code>upload_max_filesize</code>, request size &amp; nesting at the frontend. Do <b>not</b> use <code>RLIMIT_AS</code>/<code>RLIMIT_DATA</code>.</td><td>server / proxy</td></tr>
+          <tr><td class="mono">…619</td><td>Set <code>session.upload_progress.enabled=0</code></td><td>php.ini / FPM pool (before parsing) — not <code>ini_set()</code></td></tr>
+          <tr><td class="mono">…619</td><td>On PHP 8.5 also set <code>fatal_error_backtraces=0</code></td><td>php.ini (admin), then restart workers</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="disc">Runtime <code>ini_set()</code> and <code>.user.ini</code> apply too late for the …619 mitigations — they must be set before request parsing.</p>
+    <div class="note"><b>Related advisory: CVE-2026-115560 (23 Oct).</b> This distinct session-upload-progress issue needs an unusual runtime switch of <code>session.serialize_handler</code> before <code>session_start()</code>. Keep upload progress disabled; track the next PHP release for its fix.</div>
+   </section>
+
+   <section>
+     <div class="seclabel">// response drill</div>
+     <h2>Make the call</h2>
+     <p>A short defensive incident exercise. Work through the decisions in order; each answer explains the operational reason without simulating an exploit.</p>
+     <div class="drill" id="drill" aria-labelledby="drillTitle">
+       <div class="drill-top">
+         <div><h3 id="drillTitle">PHP2SHELL response drill</h3><p>Scenario: an internet-facing service reports PHP 8.4.26 running via Apache <code>mod_php</code>.</p></div>
+         <div class="score" aria-live="polite"><b id="scoreValue">0 / 3</b><span>decisions correct</span></div>
+       </div>
+       <div class="missions">
+         <article class="mission" data-mission="version"><div class="mh"><span class="num">1</span> Triage</div><p>How should this version be classified?</p><div class="choices"><button class="choice" data-answer="wrong">Patched</button><button class="choice" data-answer="correct">Vulnerable</button><button class="choice" data-answer="wrong">Out of scope</button></div><div class="mission-feedback" role="status"></div></article>
+         <article class="mission" data-mission="surface"><div class="mh"><span class="num">2</span> Prioritize</div><p>Which deployment surface needs the fastest validation?</p><div class="choices"><button class="choice" data-answer="wrong">CLI binary</button><button class="choice" data-answer="correct">Apache mod_php</button><button class="choice" data-answer="wrong">Static assets</button></div><div class="mission-feedback" role="status"></div></article>
+         <article class="mission" data-mission="contain"><div class="mh"><span class="num">3</span> Contain</div><p>What is the complete first response?</p><div class="choices"><button class="choice" data-answer="wrong">Hide PHP errors</button><button class="choice" data-answer="wrong">Raise container memory</button><button class="choice" data-answer="correct">Patch and restart workers</button></div><div class="mission-feedback" role="status"></div></article>
+       </div>
+       <div class="drill-summary" id="drillSummary" role="status">Response path complete: confirm the web SAPI version after the restart, then retain logs and review the detection signals below.</div>
+     </div>
+   </section>
+
+  <section>
+    <div class="seclabel">// detection</div>
+    <h2>Detection notes</h2>
+    <ul class="tight">
+      <li><b>Public PoCs exist.</b> Working proof-of-concept code is published by multiple researchers, and in-the-wild attempts are confirmed.</li>
+      <li>Watch for multipart POSTs with unusually many fields or headers, large bodies, repeated out-of-memory / HTTP 500 responses, and Apache child crashes or restarts.</li>
+      <li>Grep logs for <code>zend_mm_heap corrupted</code> and <code>Allowed memory size … exhausted</code> in <code>Unknown on line 0</code> — evidence the failure happened before application code.</li>
+      <li>For …619, correlate fatal errors / timeouts immediately followed by unusual behavior on the same worker.</li>
+      <li>Treat absence of error-log entries as inconclusive — the stale-state path leaves no required trace.</li>
+      <li>A focused edge control is to block <code>PHP_SESSION_UPLOAD_PROGRESS</code> in multipart bodies. Reference Suricata, Sigma, ModSecurity, and Lua detections are available with the ikow PoC research.</li>
+      <li>Inventory every PHP install, including bundled/embedded ones behind appliances and containers.</li>
+    </ul>
+    <div class="note">Confirm your exact build after updating: <code>php -v</code> on CLI reflects the CLI SAPI; verify the web SAPI (mod_php / FPM) separately, then restart all workers.</div>
+  </section>
+
+  <section>
+    <div class="seclabel">// detection rules</div>
+    <h2>Detection rules</h2>
+    <p>Behavioral starting points, built from the confirmed mechanism — not signatures of any one exploit. Both flaws corrupt memory, so the strongest signal is host-side: worker crashes and respawns, not a clean network payload. Treat these as illustrative and tune to your stack.</p>
+
+    <div class="rule-card">
+      <span class="rl">SIEM<span class="rt">Sigma · host/app logs · strongest signal</span></span>
+      <pre class="rule"><span class="cm"># php-fpm / apache mod_php worker crash + UAF indicators</span>
+title: PHP2SHELL worker crash indicators
+logsource:
+  product: linux
+  service: php-fpm        <span class="cm"># also apache error_log for mod_php</span>
+detection:
+  crash:
+    message|contains:
+      - 'exited on signal 11'    <span class="cm"># SIGSEGV</span>
+      - 'exited on signal 6'     <span class="cm"># SIGABRT</span>
+      - 'zend_mm_heap corrupted'
+      - 'out of memory'
+  interrupted:               <span class="cm"># CVE-2026-109619 precondition</span>
+    message|contains:
+      - 'Fatal error'
+      - 'Maximum execution time'
+  timeframe: 2m
+  condition: crash or ( interrupted and crash )
+falsepositives:
+  - Legitimate OOM under load
+  - Segfaults from unrelated extensions
+level: high</pre>
+    </div>
+
+    <div class="rule-card">
+      <span class="rl">IDS<span class="rt">Suricata · network heuristic</span></span>
+      <pre class="rule"><span class="cm"># Burst of multipart POSTs from one source (CVE-2026-109618 surface)</span>
+alert http any any -&gt; $HTTP_SERVERS any ( \
+  msg:"PHP2SHELL possible OOM probe: multipart POST burst"; \
+  flow:to_server,established; \
+  http.method; content:"POST"; \
+  http.header; content:"multipart/form-data"; nocase; \
+  threshold: type both, track by_src, count 20, seconds 10; \
+  sid:2026109618; rev:1; )</pre>
+    </div>
+
+    <div class="rule-card">
+      <span class="rl">WAF<span class="rt">ModSecurity · request-shape heuristic</span></span>
+      <pre class="rule"><span class="cm"># Flag abnormal multipart bodies; tune thresholds per app. Reduces exposure, not a fix.</span>
+SecRule REQUEST_METHOD "@streq POST" \
+  "id:2026109618,phase:2,log,pass,msg:'PHP2SHELL: inspect multipart shape',chain"
+  SecRule REQUEST_HEADERS:Content-Type "@rx multipart/form-data" "chain"
+    SecRule &FILES "@gt 200"        <span class="cm"># unusually high part count — set to your real ceiling</span>
+
+<span class="cm"># Also block the stale-state trigger name in multipart bodies:</span>
+SecRule MULTIPART_PART_HEADERS "@rx PHP_SESSION_UPLOAD_PROGRESS" \
+  "id:2026109619,phase:2,log,pass,msg:'PHP2SHELL: upload-progress field present'"</pre>
+    </div>
+
+    <div class="note"><b>Before you trust any rule:</b> validate against your own traffic, watch false positives (crashes and large uploads happen for benign reasons), and remember these catch known patterns, not all variants. Absence of alerts does not prove safety — the …619 path can leave no required trace. Pre-built rule sets (e.g. the ikow PoC <code>detection/</code> — Suricata, Sigma, ModSecurity, Lua) are useful to compare against, but review every rule before deploying it.</div>
+  </section>
+
+  <section class="sources">
+    <div class="seclabel">// sources</div>
+    <p>
+      <a href="https://www.php.net/archive/2026.php#2026-10-21-5" target="_blank" rel="noopener">PHP.net advisory</a>
+      <a href="https://www.php.net/archive/2026.php" target="_blank" rel="noopener">PHP session advisory (23 Oct)</a>
+      <a href="https://www.tenable.com/blog/php2shell-cve-2026-109618-cve-2026-109619-frequently-asked-questions-about-critical-php-remote" target="_blank" rel="noopener">Tenable FAQ</a>
+      <a href="https://www.rapid7.com/blog/post/etr-cve-2026-109618-and-cve-2026-109619-critical-unauthenticated-remote-code-execution-in-php/" target="_blank" rel="noopener">Rapid7 ETR</a>
+      <a href="https://sansec.io/research/php2shell" target="_blank" rel="noopener">Sansec</a>
+      <a href="https://cert.europa.eu/publications/security-advisories/2026-018/" target="_blank" rel="noopener">CERT-EU 2026-018</a>
+      <a href="https://github.com/ikow/php2shell-poc" target="_blank" rel="noopener">ikow PoC research</a>
+      <a href="https://github.com/devploit/php2shell" target="_blank" rel="noopener">devploit research</a>
+    </p>
+  </section>
+</main>
+
+<footer class="wrap">Educational explainer · mechanisms &amp; mitigations only · verify against vendor advisories before acting.</footer>
+
+<script>
+(function(){
+  // theme toggle
+  var root=document.documentElement, tb=document.getElementById('themeBtn');
+  function cur(){var e=root.getAttribute('data-theme'); if(e)return e; return matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme', cur()==='dark'?'light':'dark');});
+
+  // tabs
+  var tabs=[document.getElementById('tab1'),document.getElementById('tab2')];
+  var panels=[document.getElementById('p1'),document.getElementById('p2')];
+  tabs.forEach(function(t,i){t.addEventListener('click',function(){
+    tabs.forEach(function(x,j){x.setAttribute('aria-selected', j===i?'true':'false'); panels[j].hidden=(j!==i);});
+  });});
+
+  // version checker
+  function parse(v){var m=String(v).trim().match(/^(\d+)\.(\d+)(?:\.(\d+))?(?:[- ]?(alpha|beta|rc)(\d+)?)?/i); if(!m)return null; return [+m[1],+m[2],m[3]==null?null:+m[3],(m[4]||'').toLowerCase(),m[5]==null?null:+m[5]];}
+  var fixes={'8.2':35,'8.3':36,'8.4':27,'8.5':12};
+  function assess(v){
+    var p=parse(v); if(!p) return {cls:'v-warn',h:'Unrecognized',b:'Enter a version like <b>8.3.21</b>.'};
+    var maj=p[0],min=p[1],pat=p[2],pre=p[3],preN=p[4], branch=maj+'.'+min;
+    if(maj<5 || (maj===5&&min<4)) return {cls:'v-warn',h:'Out of scope',b:branch+' predates the earliest affected code path (PHP 5.4.0).'};
+    if(maj===5 || (maj===7&&min<4)) return {cls:'v-crit',h:'Affected · end-of-life',b:branch+' is affected and EOL — <b>no fix exists</b>. Upgrade to a supported branch urgently.'};
+    if((maj===7&&min===4)||(maj===8&&min<2)) return {cls:'v-crit',h:'Affected · no binary release',b:branch+' is affected. Only a <b>source backport</b> exists; apply it or move to a supported branch.'};
+    var fix=fixes[branch];
+    if(fix==null){ if(maj===8&&min===6){ if(pre && (pre!=='rc'||preN==null||preN<4)) return {cls:'v-crit',h:'Earlier prerelease',b:'The fix first appears in <b>8.6.0 RC4</b>. Update to a supported fixed release.'}; return {cls:'v-ok',h:'Fix present since RC4',b:branch+' includes the fix starting at 8.6.0 RC4. RC builds are not for production; use a supported fixed release until 8.6 GA.'}; } return {cls:'v-warn',h:'Unknown branch',b:branch+' is newer than the tracked set. Confirm against the PHP advisory.'}; }
+    if(pat==null) return {cls:'v-warn',h:'Patch level needed',b:'Specify the patch version. '+branch+' is fixed in <b>'+branch+'.'+fix+'</b>.'};
+    if(pat>=fix) return {cls:'v-ok',h:'Patched',b:maj+'.'+min+'.'+pat+' is at or above the fixed release ('+branch+'.'+fix+'). Still verify the web SAPI and restart workers.'};
+    return {cls:'v-crit',h:'Vulnerable',b:maj+'.'+min+'.'+pat+' is below the fix. Update to <b>'+branch+'.'+fix+'</b> (or later) immediately.'};
+  }
+  var vd=document.getElementById('verdict'), inp=document.getElementById('ver');
+  function run(){var r=assess(inp.value); vd.className='verdict show '+r.cls; vd.innerHTML='<div class="vh">'+r.h+'</div>'+r.b;}
+   document.getElementById('checkBtn').addEventListener('click',run);
+   inp.addEventListener('keydown',function(e){if(e.key==='Enter')run();});
+   document.querySelectorAll('.examples b').forEach(function(b){b.addEventListener('click',function(){inp.value=b.getAttribute('data-v');run();});});
+
+   // Defensive decision drill: no exploit inputs or network activity.
+   var drillAnswers={
+     version:'Correct. PHP 8.4.26 is below the fixed 8.4.27 release; treat the web service as vulnerable until updated.',
+     surface:'Correct. mod_php is the priority because the OOM path can be reached before application code runs.',
+     contain:'Correct. Updating PHP is the complete remediation; restarting ensures every web worker loads the fixed build.'
+   };
+   var drillMiss={
+     version:'Not yet. Compare the installed patch number with 8.4.27, then classify it before deciding on containment.',
+     surface:'Not the priority here. Validate the web SAPI that receives requests, especially Apache mod_php, not just the CLI binary.',
+     contain:'Not sufficient. Error suppression and resource changes do not fix the core issue; patch PHP and restart all workers.'
+   };
+   var score=0,completed={};
+   document.querySelectorAll('.mission').forEach(function(mission){
+     mission.querySelectorAll('.choice').forEach(function(choice){choice.addEventListener('click',function(){
+       var id=mission.getAttribute('data-mission'),feedback=mission.querySelector('.mission-feedback');
+       if(choice.getAttribute('data-answer')==='correct'){
+         if(!completed[id]){completed[id]=true;score++;document.getElementById('scoreValue').textContent=score+' / 3';}
+         mission.classList.add('done');
+         mission.querySelectorAll('.choice').forEach(function(button){button.disabled=true;});
+         feedback.className='mission-feedback show good';feedback.textContent=drillAnswers[id];
+         if(score===3)document.getElementById('drillSummary').className='drill-summary show';
+       }else{
+         feedback.className='mission-feedback show retry';feedback.textContent=drillMiss[id];
+       }
+     });});
+   });
+
+   // ---- interactive network diagram ----
+  var NODES=[
+    {id:'atk',x:72,y:185,t:'SOURCE',n:'Attacker'},
+    {id:'net',x:196,y:185,t:'NETWORK',n:'Internet'},
+    {id:'rp',x:320,y:185,t:'EDGE',n:'Reverse proxy'},
+    {id:'web',x:452,y:185,t:'SERVER',n:'Web server'},
+    {id:'pool',x:604,y:112,t:'RUNTIME',n:'PHP workers'},
+    {id:'app',x:604,y:258,t:'DOWNSTREAM',n:'App · DB · FS'},
+    {id:'rce',x:752,y:112,t:'IMPACT',n:'RCE / shell'}
+  ];
+  var EDGES=[['atk','net'],['net','rp'],['rp','web'],['web','pool'],['pool','app'],['pool','rce',true]];
+  var ORDER=['atk','net','rp','web','pool','rce'];
+  var META={pool:'fault',rce:'outcome'};
+  // node captions by depth tier: [biz, ops, tech]
+  var TXT={
+    '618':{
+      atk:['Anyone on the internet — no login — sends a booby-trapped upload.','Unauthenticated client sends crafted multipart requests; no creds, no user interaction.','Unauthenticated multipart request shaped to exhaust memory while appearing within configured limits.'],
+      net:['Travels over the open internet to your site.','Network-reachable; exploit vector AV:N.','Routable path; AV:N / PR:N / UI:N.'],
+      rp:['Your front gate passes it on to PHP.','Reverse proxy / WAF can cap upload size and parts — reduces exposure, not a fix.','nginx / WAF can bound post_max_size, part counts and nesting at the frontend; the core flaw remains.'],
+      web:['The engine that runs your site. Here the danger starts before your own code.','mod_php executes before app code (highest risk); PHP-FPM also affected.','SAPI parses the body; under mod_php the vulnerable path runs pre-application.'],
+      pool:['The site runs out of memory mid-task and mishandles the leftover, scrambling its own memory.','Out-of-memory during request setup; cleanup touches half-built structures → memory corruption.','Allocation fails with half-initialized per-request structures; teardown frees unset fields → heap corruption.'],
+      app:['Your app and data — normally the point of the request. With mod_php, trouble hits before this.','Downstream app / DB / FS; 618 under mod_php triggers pre-application, bypassing app logic.','Normal downstream; the OOM path precedes application execution.'],
+      rce:['Attacker can now run their own commands on your server.','Code execution as the web worker user.','Heap corruption steered to RCE with the web worker’s privileges.']
+    },
+    '619':{
+      atk:['A visitor sends two linked requests — still no login.','Unauth: leave worker state, induce a fatal error / timeout, then a follow-up request.','Unauthenticated: state-leaving op, induced fatal error / timeout, then a follow-up on the same worker.'],
+      net:['Travels over the open internet to your site.','Network-reachable; AV:N, no privileges, no user interaction.','Routable path; AV:N / PR:N / UI:N.'],
+      rp:['Front gate forwards to PHP; turning off error messages will not help.','Proxy / WAF offers little; suppressing diagnostics does not block the flaw.','Diagnostic suppression (display_errors / @) does not prevent stale-state access.'],
+      web:['Runs your site using a shared pool of helpers that get reused.','Both mod_php and PHP-FPM affected; the FPM pool reuses workers across requests.','FPM pool reuses workers; routing can land a later request on the same one.'],
+      pool:['A reused helper still points at memory the site already gave back — a dangling tag.','Stale global state references freed memory on a reused worker (e.g. session upload-progress).','Stale global pointer to freed memory survives request end; the worker is reused before init clears it.'],
+      app:['Everyday features (like upload progress) leave the leftover behind.','Default features leave state; interrupted cleanup strands the pointer.','session.upload_progress (default on) / 8.5 fatal-error backtraces leave state; interrupted teardown strands it.'],
+      rce:['The next visitor’s request lets the attacker run code or read server memory.','Follow-up request triggers use-after-free → RCE or memory disclosure.','Request B dereferences freed memory → UAF → RCE / memory disclosure, worker privileges.']
+    }
+  };
+  var ROLES=[
+    {id:'exec',label:'Higher management',depth:0},
+    {id:'ntm',label:'Non-tech manager',depth:0},
+    {id:'mgr',label:'Manager',depth:1},
+    {id:'tmg',label:'Tech manager',depth:1},
+    {id:'analyst',label:'Security analyst',depth:1},
+    {id:'dev',label:'Developer',depth:2},
+    {id:'researcher',label:'Security researcher',depth:2}
+  ];
+  var LENS={
+    exec:{f:'Business risk and the decision in front of you.',b:[
+      'Unauthenticated RCE — anyone on the internet, no password, full server takeover.',
+      'Actively exploited since 17 Oct 2026, before public disclosure.',
+      'Patching is the only complete fix — approve an emergency window.',
+      'Exposure = every internet-facing PHP system you run or depend on.']},
+    ntm:{f:'Plain-language view of why this is urgent.',b:[
+      'A bug lets strangers run commands on servers that run PHP.',
+      'No login needed, and attacks are already happening.',
+      'The fix is to update PHP and restart — no partial workaround fully protects.',
+      'Ask your tech teams: are we patched, and what still runs the old version?']},
+    mgr:{f:'Coordinating the response.',b:[
+      'Inventory every PHP instance, including embedded and appliance ones.',
+      'Schedule out-of-cycle patching to the fixed releases.',
+      'Confirm all workers were restarted after any change.',
+      'Flag end-of-life PHP (5.4–7.3) — no fix exists, needs migration.']},
+    tmg:{f:'Technical ownership and architecture risk.',b:[
+      'mod_php is highest risk (fault before app code); PHP-FPM is also affected.',
+      'If you cannot patch now: apply the per-CVE config mitigations, then restart workers.',
+      'Verify the web SAPI build — not just php -v on the CLI.',
+      'ini_set() and .user.ini apply too late for the 619 mitigations.']},
+    analyst:{f:'Detection and threat hunting.',b:[
+      'Hunt crashes, segfaults and worker restarts correlated with crafted multipart uploads.',
+      '619: correlate fatal errors / timeouts with odd behavior on the same worker.',
+      'Absent error-log entries do NOT prove safety.',
+      'Back-hunt from 17 Oct 2026 — exploitation predates disclosure.']},
+    dev:{f:'Remediation you apply.',b:[
+      'Update the branch: 8.2.35 / 8.3.36 / 8.4.27 / 8.5.12.',
+      '619: session.upload_progress.enabled=0; on PHP 8.5 also fatal_error_backtraces=0.',
+      '618: memory_limit=-1 (app cannot override); bound post_max_size / upload sizes; do not use RLIMIT_AS / RLIMIT_DATA.',
+      'Set in php.ini / FPM pool before parsing — not ini_set() — then restart workers.']},
+    researcher:{f:'Root-cause mechanism.',b:[
+      '618: OOM mid-allocation leaves per-request structures half-initialized; teardown frees unset fields → heap corruption.',
+      '619: a stale global pointer to freed memory survives into a reused worker → cross-request use-after-free.',
+      'Earliest affected code path dates to PHP 5.4.0; both mod_php and FPM.',
+      'Confirmed impacts: remote code execution and memory disclosure.']}
+  };
+  function roleObj(id){for(var i=0;i<ROLES.length;i++)if(ROLES[i].id===id)return ROLES[i];return ROLES[0];}
+  var F={sc:'618',role:'exec',depth:0,sel:'atk',idx:-1,timer:null};
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var svgHost=document.getElementById('flowSvg'),narrEl=document.getElementById('flowNarr'),detEl=document.getElementById('flowDetail'),lensEl=document.getElementById('flowLens');
+  var NC={},gmap={},emap={},pkt,reuseEl;
+  NODES.forEach(function(n){NC[n.id]={x:n.x,y:n.y};});
+  function ekey(a,b){return a+'>'+b;}
+  function build(){
+    var s='<svg class="net" viewBox="0 0 820 340" role="img" aria-label="PHP request path network diagram">';
+    EDGES.forEach(function(e){
+      var a=NC[e[0]],b=NC[e[1]];
+      s+='<path class="edge'+(e[2]?' breach':'')+'" data-k="'+ekey(e[0],e[1])+'" d="M'+a.x+' '+a.y+' L'+b.x+' '+b.y+'"></path>';
+    });
+    s+='<text id="reuse" class="reuse" x="604" y="70" text-anchor="middle" style="display:none">Req A ⟲ Req B · same worker</text>';
+    NODES.forEach(function(n){
+      var cls='gnode'+(META[n.id]?' '+META[n.id]:'');
+      s+='<g class="'+cls+'" data-id="'+n.id+'" transform="translate('+n.x+','+n.y+')" tabindex="0" role="button">'+
+         '<rect x="-56" y="-26" width="112" height="52" rx="9"></rect>'+
+         '<text class="gt" x="0" y="-6" text-anchor="middle">'+n.t+'</text>'+
+         '<text class="gn" x="0" y="13" text-anchor="middle">'+n.n+'</text></g>';
+    });
+    s+='<g id="pkt" class="no-anim" transform="translate('+NC.atk.x+','+NC.atk.y+')"><circle r="7"></circle></g>';
+    s+='</svg>';
+    svgHost.innerHTML=s;
+    gmap={};emap={};
+    svgHost.querySelectorAll('.gnode').forEach(function(g){gmap[g.getAttribute('data-id')]=g;});
+    svgHost.querySelectorAll('.edge').forEach(function(p){emap[p.getAttribute('data-k')]=p;});
+    pkt=svgHost.querySelector('#pkt');reuseEl=svgHost.querySelector('#reuse');
+    svgHost.querySelectorAll('.gnode').forEach(function(g){
+      function pick(){stop();F.sel=g.getAttribute('data-id');update();detail();}
+      g.addEventListener('click',pick);
+      g.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}});
+    });
+  }
+  function update(anim){
+    var oi={};ORDER.forEach(function(id,i){oi[id]=i;});
+    NODES.forEach(function(n){
+      var g=gmap[n.id],c='gnode'+(META[n.id]?' '+META[n.id]:'');
+      if(n.id in oi && F.idx>=0){ if(oi[n.id]<F.idx)c+=' done'; if(oi[n.id]===F.idx)c+=' active'; }
+      if(n.id===F.sel)c+=' sel';
+      g.setAttribute('class',c);
+    });
+    for(var k in emap)emap[k].setAttribute('class','edge'+(emap[k].classList.contains('breach')?' breach':''));
+    if(F.idx>0){var ek=ekey(ORDER[F.idx-1],ORDER[F.idx]);if(emap[ek])emap[ek].setAttribute('class',emap[ek].classList.contains('breach')?'edge breach flow-on':'edge flow-on');}
+    var at=F.idx>=0?ORDER[F.idx]:ORDER[0];
+    pkt.classList.toggle('no-anim', !anim || reduce);
+    pkt.setAttribute('transform','translate('+NC[at].x+','+NC[at].y+')');
+    reuseEl.style.display=(F.sc==='619' && F.idx>=0 && at==='pool')?'':'none';
+  }
+  function txt(id){var e=TXT[F.sc][id];return e[F.depth];}
+  function name(id){for(var i=0;i<NODES.length;i++)if(NODES[i].id===id)return NODES[i].n;return id;}
+  function detail(){detEl.innerHTML='<div class="dh">'+name(F.sel)+'</div>'+txt(F.sel);}
+  function narrate(){
+    if(F.idx<0){narrEl.innerHTML='<span class="st">ready</span>Press Play to send a request through the stack, or click any component.';return;}
+    narrEl.innerHTML='<span class="st">hop '+(F.idx+1)+' / '+ORDER.length+' · '+name(ORDER[F.idx])+'</span>'+txt(ORDER[F.idx]);
+  }
+  function renderLens(){
+    var r=roleObj(F.role),L=LENS[r.id],h='<div class="lh">For: '+r.label+'</div><div class="lf">'+L.f+'</div><ul>';
+    L.b.forEach(function(x){h+='<li>'+x+'</li>';});
+    lensEl.innerHTML=h+'</ul>';
+  }
+  function stop(){if(F.timer){clearInterval(F.timer);F.timer=null;}}
+  function reset(){stop();F.idx=-1;F.sel=ORDER[0];update(false);detail();narrate();renderLens();}
+  function step(){if(F.idx<ORDER.length-1){F.idx++;F.sel=ORDER[F.idx];update(true);detail();narrate();}}
+  function play(){
+    stop();F.idx=-1;update(false);
+    if(reduce){F.idx=ORDER.length-1;F.sel=ORDER[F.idx];update(false);detail();narrate();return;}
+    F.timer=setInterval(function(){
+      if(F.idx>=ORDER.length-1){stop();return;}
+      F.idx++;F.sel=ORDER[F.idx];update(true);detail();narrate();
+    },1400);
+  }
+  document.getElementById('flowPlay').addEventListener('click',play);
+  document.getElementById('flowStep').addEventListener('click',function(){stop();step();});
+  document.getElementById('flowReset').addEventListener('click',reset);
+  document.querySelectorAll('.seg[data-sc]').forEach(function(b){b.addEventListener('click',function(){
+    document.querySelectorAll('.seg[data-sc]').forEach(function(x){x.setAttribute('aria-pressed', x===b?'true':'false');});
+    F.sc=b.getAttribute('data-sc');reset();
+  });});
+  document.getElementById('roleSel').addEventListener('change',function(){
+    F.role=this.value;F.depth=roleObj(F.role).depth;renderLens();detail();narrate();
+  });
+  build();reset();
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;900&display=swap">
+
+</body></html>
