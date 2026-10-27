@@ -3,6 +3,73 @@
 
   window.BLOGS_DATA = [
     {
+      "slug": "agentic-red-teaming-autonomous-offensive-operator-pwc-cyber-summit",
+      "title": "Agentic Red Teaming: Building an Autonomous Offensive Operator with Local AI",
+      "date": "September 20, 2026",
+      "author": "Mohammed Danish Amber",
+      "category": "AI Security",
+      "readTime": "6 min read",
+      "excerpt": "A 90-minute hands-on workshop at the PwC Cyber Summit: standing up a self-hosted autonomous offensive operator on a Kali VM with OpenCode, the HexStrike AI MCP (150+ tools), and the Aegis-X agent stack.",
+      "tags": ["PwC Cyber Summit", "Agentic Operator", "OpenCode", "HexStrike AI", "Aegis-X", "Red Teaming"],
+      "content": `# Agentic Red Teaming: Building an Autonomous Offensive Operator with Local AI
+
+At the **PwC Cyber Summit** (Kolkata, 19–20 September 2026), I ran a 90-minute **hands-on workshop** taking attendees from a clean machine to a working autonomous offensive operator — running entirely on their own hardware, against live lab targets.
+
+Where the conference keynote framed the *why* of agentic offence, this session was the *how*: everyone left with a self-hosted operator they built and drove themselves.
+
+---
+
+## What attendees built
+
+A working, self-hosted autonomous offensive operator on a personal **Kali Linux VM**:
+
+*   **OpenCode** — the agent harness ("the brain") that plans, reasons, and drives the operation.
+*   **HexStrike AI MCP** — 150+ security tools exposed to the agent over the Model Context Protocol (Flask API on :8888 + a stdio bridge).
+*   **A local model provider** — each attendee's own key (OpenRouter / Ollama Cloud / OpenCode Zen), keeping reasoning off public corporate paths.
+*   **VPN to a live range** — a reachable HTB/THM target box, authorized and isolated.
+*   **Aegis-X** — the operator layer (agents, subagents, and skills) that turns OpenCode into a disciplined, scope-aware offensive operator, installed live in the room.
+
+---
+
+## The Aegis-X operator stack
+
+The workshop's offensive logic ships as **Aegis-X**: standalone Markdown agent definitions loaded by OpenCode. The stack is **11 primary agents + 12 subagents**.
+
+**Primary operators** map to engagement profiles — \`security-auditor\`, \`red-operator\`, \`penetration-operator\`, and the white/grey/black-box tiers — plus \`osint-operator\`, \`coder-operator\`, \`threat-modeler\`, and \`devsecops-operator\`.
+
+**Subagents** are the task units a primary delegates to: \`scope\`, \`osint\`, \`recon\`, \`scan\`, \`analysis\`, \`triage\`, \`exploit\`, \`post-exploit\`, \`code-review\`, \`report\`, \`remediation\`, and \`documentation\`.
+
+Access between them is governed by an explicit **Agent × Subagent matrix** — \`allow\` (autonomous), \`ask\` (operator confirmation), or denied. **Exploitation and post-exploitation are always gated to \`ask\`** — a human approves every destructive action.
+
+---
+
+## Safety is a hard rule, not a hope
+
+Every agent carries a per-agent permission block gating \`read\`, \`edit\`, \`bash\`, \`task\`, \`webfetch\`, and more — each set to \`allow\`, \`ask\`, or \`deny\`. The \`bash\` grammar uses glob patterns with **last-matching-rule-wins** ordering (wildcard \`"*"\` first, specifics after), so a read-only role can be made genuinely read-only and a passive role can be denied active scanning.
+
+Attendees also generated their own operators live: one well-shaped prompt produces a production-ready agent — frontmatter, permissions, and workflow — in the exact format OpenCode loads.
+
+---
+
+## Scope & ethics
+
+The operator can autonomously execute offensive tooling, so the first rule is the only rule that matters: **run it only against machines you are authorized to test** — your own HTB/THM instances, CTF boxes, or systems with written permission. Every subagent verifies scope before acting, and the \`scope\` subagent must run before any active operation.
+
+---
+
+## Workshop materials
+
+Everything from the session is published below:
+
+*   👉 [**Live Slide Deck — Agentic Red Teaming (OpenCode Edition)**](talks/2026/PwC/The-Agentic-Operator-OpenCode-Only.html)
+*   👉 [**Workshop Setup Guide (README)**](talks/2026/PwC/Readme.MD)
+*   👉 [**Prerequisites Checklist**](talks/2026/PwC/Pre-requisites.MD)
+*   👉 [**Aegis-X — Agents & Sub-Agents Catalog**](talks/2026/PwC/aegis-x-agents-catalog.md)
+*   👉 [**Prompting an Operator Into Existence**](talks/2026/PwC/prompt-to-generate-an-agent.md)
+
+The deck is a live-rendered interactive HTML document with built-in terminal views and architecture diagrams, best viewed on desktop.`
+    },
+    {
       "slug": "agentic-operator-automating-adversarial-reasoning-local-ai",
       "title": "The Agentic Operator: Automating Adversarial Reasoning with Local AI",
       "date": "June 22, 2026",
