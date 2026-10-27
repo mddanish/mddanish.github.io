@@ -19,6 +19,20 @@ Where the conference keynote framed the *why* of agentic offence, this session w
 
 ---
 
+## From the Workshop — PwC SecureVision Summit, Kolkata
+
+![Walking through the live autonomous operator — OpenCode driving nmap against an authorized target](assets/talks/pwc-cyber-summit-2026-live-operator.jpg)
+
+![Delivering the Agentic Red Teaming workshop at the PwC Cyber Summit](assets/talks/pwc-cyber-summit-2026-keynote-01.jpg)
+
+![Framing the question: run it in a lab, or wait for someone else to use it against you](assets/talks/pwc-cyber-summit-2026-keynote-02.jpg)
+
+![Workshop attendees at the PwC SecureVision Summit](assets/talks/pwc-cyber-summit-2026-group-01.jpg)
+
+![Full house — the PwC Cyber Summit, Kolkata](assets/talks/pwc-cyber-summit-2026-group-02.jpg)
+
+---
+
 ## What attendees built
 
 A working, self-hosted autonomous offensive operator on a personal **Kali Linux VM**:
