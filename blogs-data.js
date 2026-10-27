@@ -26,6 +26,20 @@ Both presentation decks are fully dynamic, live-rendered interactive HTML docume
 
 ---
 
+## From the Stage — ICETCSDP 2026
+
+Delivered live at the **International Conference on Emerging Trends in Cyber Security & Digital Protection (ICETCSDP 2026)**, Meghnad Saha Institute of Technology (MSIT), Kolkata — 19–20 June 2026.
+
+![ICETCSDP 2026 speaker feature — The Agentic Operator](assets/talks/icetcsdp-2026-speaker-poster.jpg)
+
+![Keynote: The Agentic Operator at ICETCSDP 2026](assets/talks/icetcsdp-2026-keynote-01.jpg)
+
+![Presenting the autonomous adversary-reasoning loop](assets/talks/icetcsdp-2026-keynote-02.jpg)
+
+![Felicitation at ICETCSDP 2026, MSIT Kolkata](assets/talks/icetcsdp-2026-award.jpg)
+
+---
+
 ## The Paradigm: Reasoning Over Scripting
 
 The core premise of the Agentic Operator is moving beyond static automation scripts. In a standard red team engagement, a human operator operates in a loop: **Think → Act → Observe**. 
