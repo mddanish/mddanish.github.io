@@ -9,11 +9,11 @@
       "author": "Mohammed Danish Amber",
       "category": "AI Security",
       "readTime": "6 min read",
-      "excerpt": "A 90-minute hands-on workshop at the PwC Cyber Summit: standing up a self-hosted autonomous offensive operator on a Kali VM with OpenCode, the HexStrike AI MCP (150+ tools), and the Aegis-X agent stack.",
-      "tags": ["PwC Cyber Summit", "Agentic Operator", "OpenCode", "HexStrike AI", "Aegis-X", "Red Teaming"],
+      "excerpt": "A 90-minute hands-on workshop at the PwC SecureVision Summit: standing up a self-hosted autonomous offensive operator on a Kali VM with OpenCode, the HexStrike AI MCP (150+ tools), and the Aegis-X agent stack.",
+      "tags": ["SecureVision Summit", "PwC", "Agentic Operator", "OpenCode", "HexStrike AI", "Aegis-X", "Red Teaming"],
       "content": `# Agentic Red Teaming: Building an Autonomous Offensive Operator with Local AI
 
-At the **PwC Cyber Summit** (Kolkata, 19–20 September 2026), I ran a 90-minute **hands-on workshop** taking attendees from a clean machine to a working autonomous offensive operator — running entirely on their own hardware, against live lab targets.
+At the **SecureVision Summit** — PwC, Kolkata (ODSec × Null Kolkata), 19–20 September 2026, I ran a 90-minute **hands-on workshop** taking attendees from a clean machine to a working autonomous offensive operator — running entirely on their own hardware, against live lab targets.
 
 Where the conference keynote framed the *why* of agentic offence, this session was the *how*: everyone left with a self-hosted operator they built and drove themselves.
 
@@ -23,13 +23,13 @@ Where the conference keynote framed the *why* of agentic offence, this session w
 
 ![Walking through the live autonomous operator — OpenCode driving nmap against an authorized target](assets/talks/pwc-cyber-summit-2026-live-operator.jpg)
 
-![Delivering the Agentic Red Teaming workshop at the PwC Cyber Summit](assets/talks/pwc-cyber-summit-2026-keynote-01.jpg)
+![Delivering the Agentic Red Teaming workshop at the SecureVision Summit](assets/talks/pwc-cyber-summit-2026-keynote-01.jpg)
 
 ![Framing the question: run it in a lab, or wait for someone else to use it against you](assets/talks/pwc-cyber-summit-2026-keynote-02.jpg)
 
 ![Workshop attendees at the PwC SecureVision Summit](assets/talks/pwc-cyber-summit-2026-group-01.jpg)
 
-![Full house — the PwC Cyber Summit, Kolkata](assets/talks/pwc-cyber-summit-2026-group-02.jpg)
+![Full house — the SecureVision Summit, Kolkata](assets/talks/pwc-cyber-summit-2026-group-02.jpg)
 
 ![Null Kolkata speaker line-up at the SecureVision Summit, attendees running the operator on Kali](assets/talks/pwc-cyber-summit-2026-speakers-null-kolkata.jpg)
 
