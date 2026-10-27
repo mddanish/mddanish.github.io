@@ -31,6 +31,16 @@ Where the conference keynote framed the *why* of agentic offence, this session w
 
 ![Full house — the PwC Cyber Summit, Kolkata](assets/talks/pwc-cyber-summit-2026-group-02.jpg)
 
+![Null Kolkata speaker line-up at the SecureVision Summit, attendees running the operator on Kali](assets/talks/pwc-cyber-summit-2026-speakers-null-kolkata.jpg)
+
+![Fielding questions during the hands-on session](assets/talks/pwc-cyber-summit-2026-keynote-03.jpg)
+
+![With the ODSec crew after the workshop](assets/talks/pwc-cyber-summit-2026-group-03.jpg)
+
+![SecureVision Summit — Kolkata · ODSec x Null Kolkata](assets/talks/pwc-cyber-summit-2026-securevision-banner.jpg)
+
+![Walking the room through the agentic attack loop](assets/talks/pwc-cyber-summit-2026-keynote-04.jpg)
+
 ---
 
 ## What attendees built
