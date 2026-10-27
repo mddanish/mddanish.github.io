@@ -41,6 +41,10 @@ Where the conference keynote framed the *why* of agentic offence, this session w
 
 ![Walking the room through the agentic attack loop](assets/talks/pwc-cyber-summit-2026-keynote-04.jpg)
 
+![Explaining operator scope and the human-in-the-loop gate](assets/talks/pwc-cyber-summit-2026-keynote-05.jpg)
+
+![Day 2 of the SecureVision Summit — hands-on lab in full swing](assets/talks/pwc-cyber-summit-2026-group-04-day2.jpg)
+
 ---
 
 ## What attendees built
