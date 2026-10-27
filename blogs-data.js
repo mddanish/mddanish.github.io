@@ -3,6 +3,192 @@
 
   window.BLOGS_DATA = [
     {
+      "slug": "aphasia-agentry-evidence-based-bas-for-ai-agents",
+      "title": "Aphasia Agentry: Evidence-Based Breach & Attack Simulation for AI Agents",
+      "date": "October 26, 2026",
+      "author": "Mohammed Danish Amber",
+      "category": "AI Security",
+      "readTime": "7 min read",
+      "excerpt": "An open-source agentic breach-and-attack-simulation tool for AI agents and MCP servers — it attacks a target, proves impact with planted canaries instead of an LLM judge, and reports against the OWASP LLM Top 10 and MITRE ATLAS.",
+      "tags": ["Aphasia Agentry", "BAS", "MCP", "OWASP LLM Top 10", "MITRE ATLAS", "AI Security"],
+      "content": `# Aphasia Agentry: Evidence-Based Breach & Attack Simulation for AI Agents
+
+[**Aphasia Agentry**](https://github.com/mddanish/Aphasia-Agentry) is an open-source agentic **breach-and-attack-simulation (BAS)** tool built for a target class traditional BAS ignores: **AI agents and MCP servers**. It runs simulated attacks against a target, confirms whether each one actually reached impact, and reports the results mapped to the **OWASP LLM Top 10** and **MITRE ATLAS**.
+
+The design goal is simple but strict: a finding only counts when there is **proof**, not when a model says so.
+
+---
+
+## Why it exists
+
+LLM-backed agents and MCP servers expose a new, messy attack surface — prompt injection, tool poisoning, memory poisoning, data exfiltration, denial of wallet. Most "AI red-team" tooling grades its own homework: an LLM judge decides whether an attack "worked", which is noisy, non-reproducible, and gameable.
+
+Aphasia replaces the judge with **evidence**.
+
+---
+
+## How it works
+
+An attacker — either curated seed payloads or an LLM — sends payloads to a target over **HTTP or MCP**. Impact is then verified by hard evidence:
+
+*   **Per-run HMAC canary records** are planted in the target. A hit on a canary is proof that data was reached or exfiltrated — not an opinion.
+*   **A record-only mirror** captures mutating tool calls, so destructive actions are observed without being executed for real.
+*   **Cost markers** detect budget abuse (denial of wallet).
+*   Every step is appended to **\`evidence.jsonl\`** — an append-only log. The generated report (HTML or JSON) shows each attack, its framework mapping, the proof, a timeline, and a suggested fix.
+
+---
+
+## Attacker modes
+
+| Mode | LLM? | Behavior |
+|------|------|----------|
+| \`seed\` | No | Curated payloads only — fully reproducible, no model needed. |
+| \`adaptive\` | Yes | An LLM plans each step based on responses. |
+| \`hybrid\` *(default)* | Yes | Runs seeds first, then adapts. |
+
+---
+
+## Coverage
+
+**11 scenarios spanning LLM01–LLM10** — prompt injection, sensitive-data exfiltration, tool poisoning, memory poisoning, denial of wallet, and more.
+
+Multi-provider LLM support through **litellm**: OpenAI, Anthropic, Gemini, Groq, OpenRouter, Bedrock, vLLM, LM Studio, and Ollama. Targets can be the bundled fixture, your own HTTP agent, or any MCP server.
+
+---
+
+## Tech stack
+
+*   **Python 3.11+**, packaged on PyPI as \`aphasia-agentry\`, managed with \`uv\`
+*   **litellm** for provider-agnostic LLM access
+*   **Docker Compose** for the deliberately vulnerable fixture
+*   **GitHub Actions** CI · **Apache-2.0** license
+
+---
+
+## Quick start
+
+\`\`\`bash
+# No-LLM, reproducible run against the bundled fixture
+uvx aphasia-agentry run --mode seed
+
+# LLM attacker against your own agent or MCP endpoint
+aphasia run --model <provider/model> --target <url-or-mcp-endpoint>
+\`\`\`
+
+> ⚠️ The bundled fixture is **intentionally vulnerable** and sandbox-inert. Run it on **localhost only** — never expose it on a network.
+
+---
+
+## Bottom line
+
+Aphasia Agentry treats AI-agent security like real BAS: attack, **prove impact with evidence**, map to recognised frameworks, and hand back an actionable report. Reproducible by default, adaptive when you want it, and honest about what it actually proved.
+
+Source, scenarios, and docs: [**github.com/mddanish/Aphasia-Agentry**](https://github.com/mddanish/Aphasia-Agentry).`
+    },
+    {
+      "slug": "php2shell-cve-2026-109618-109619-php-rce",
+      "title": "PHP2SHELL: Two Critical Pre-Auth RCE Flaws in the PHP Interpreter",
+      "date": "October 24, 2026",
+      "author": "Mohammed Danish Amber",
+      "category": "Threat Intelligence",
+      "readTime": "8 min read",
+      "excerpt": "Two memory-safety bugs in PHP's request lifecycle (CVE-2026-109618 and CVE-2026-109619) give unauthenticated attackers remote code execution as the web worker. CVSS 9.2, exploited in the wild before disclosure. Mechanism, exploit chains, fixes, and detection.",
+      "tags": ["PHP", "CVE-2026-109618", "CVE-2026-109619", "RCE", "mod_php", "Threat Intelligence"],
+      "content": `# PHP2SHELL: Two Critical Pre-Auth RCE Flaws in the PHP Interpreter
+
+On **21 October 2026** the PHP project disclosed **PHP2SHELL** — two memory-safety vulnerabilities in the interpreter's request lifecycle. Both let an **unauthenticated** attacker reach remote code execution with the privileges of the web worker. **CVSS 9.2 (Critical).**
+
+Amazon Threat Intelligence observed exploitation attempts starting **17 October 2026 — four days before public disclosure**. This is a patch-out-of-cycle event.
+
+> 🧪 I built a full interactive explainer for this — live version checker, per-flaw walkthrough, an attack-path diagram across a real stack, a defensive response drill, and SIEM/IDS/WAF detection rules: [**Open the PHP2SHELL interactive explainer →**](blogs/php2shell.html)
+
+---
+
+## The two flaws
+
+### CVE-2026-109618 — memory corruption during out-of-memory handling
+
+A heap memory-corruption bug. When an allocation **fails mid-request** (while per-request structures are only half-initialized), the teardown path treats the incomplete structures as valid — reading and freeing fields that were never set up. Operating on that invalid state corrupts the heap, which an attacker controlling the layout can steer toward code execution.
+
+*   **Class:** heap memory corruption
+*   **Vector:** network, unauthenticated — crafted multipart requests exhaust memory while appearing within configured limits
+*   **Impact:** RCE as the web worker; confirmed from **PHP 5.4.0 onward**
+*   **Highest risk:** \`mod_php\` — the fault is reachable **before application code runs**
+
+**Why resource limits don't save you:** \`RLIMIT_AS\` / \`RLIMIT_DATA\` can actually *trigger* the vulnerable path. Container and cgroup caps help availability but are not a fix.
+
+### CVE-2026-109619 — use-after-free across requests
+
+A cross-request use-after-free driven by **stale global state**. A request leaves state behind on a pooled worker; cleanup is interrupted by a fatal error or timeout, so the normal reset never fully clears it. Memory is freed, but a stale global pointer still refers to it — and the worker stays alive for reuse. The next request lands on the same worker and touches the stale pointer before init clears it, using freed memory an attacker can have reallocated.
+
+*   **Class:** use-after-free (cross-request)
+*   **Confirmed paths:** session upload-progress (**on by default**); fatal-error backtraces (PHP 8.5)
+*   **Affected models:** both \`mod_php\` and PHP-FPM
+*   **Impact:** RCE as the web worker; memory disclosure also confirmed
+
+**Silence is not safety:** suppressing diagnostics (\`error_reporting\`, \`display_errors\`, \`@\`) does not stop stale-state access. Absent log entries do not prove safety.
+
+---
+
+## The five exploit chains
+
+Public analysis maps the two CVEs to five concrete chains — one OOM path (…618) and four stale-state paths (…619):
+
+| Chain | CVE | Vector | Pre-auth | Precondition | SAPI |
+|-------|-----|--------|----------|--------------|------|
+| A | …619 | Session injection + LFI | yes | App has an LFI sink | all |
+| B | …619 | \`var_destroy\` UAF → handler overwrite | no | App calls \`unserialize()\` | all |
+| C | …619 | Handler mismatch → \`__destruct\` | yes | Two dirs use different \`serialize_handler\` | FPM |
+| D | …618 | OOM corruption → stale \`EG()\` | yes | **None — any endpoint** | mod_php |
+| E | …619 | FPM session OOM → stale \`BG()\` | yes | Producer calls \`session_start()\` | FPM |
+
+**Chain D is the headline.** It needs no application feature, LFI, or \`unserialize()\` — only a reachable \`mod_php\` worker.
+
+---
+
+## Affected versions & fixes
+
+Updating is the **only** complete remediation. Every config change needs a full worker restart.
+
+| Branch | Fixed release | Status |
+|--------|---------------|--------|
+| 8.5.x | 8.5.12 | supported |
+| 8.4.x | 8.4.27 | supported |
+| 8.3.x | 8.3.36 | supported |
+| 8.2.x | 8.2.35 | supported |
+| 7.4 – 8.1 | source backport | no binary release |
+| 5.4 – 7.3 | — none — | EOL · no fix |
+
+---
+
+## If you cannot patch immediately
+
+| CVE | Temporary mitigation | Applied where |
+|-----|----------------------|---------------|
+| …618 | Enforce \`memory_limit=-1\` so apps cannot override it | php.ini (admin) + restart |
+| …618 | Bound \`post_max_size\`, \`upload_max_filesize\`, request size & nesting at the frontend. Do **not** use \`RLIMIT_AS\`/\`RLIMIT_DATA\`. | server / proxy |
+| …619 | Set \`session.upload_progress.enabled=0\` | php.ini / FPM pool (before parsing) |
+| …619 | On PHP 8.5 also set \`fatal_error_backtraces=0\` | php.ini (admin) + restart |
+
+Runtime \`ini_set()\` and \`.user.ini\` apply too late for the …619 mitigations — they must be set before request parsing.
+
+---
+
+## Detection
+
+*   Public PoCs exist and in-the-wild attempts are confirmed — hunt now, back to 17 Oct 2026.
+*   Watch for multipart POSTs with unusually many fields/headers, large bodies, repeated OOM / HTTP 500s, and Apache child crashes/restarts.
+*   Grep logs for \`zend_mm_heap corrupted\` and \`Allowed memory size … exhausted\` in \`Unknown on line 0\` — evidence the failure happened before application code.
+*   For …619, correlate fatal errors / timeouts immediately followed by odd behavior on the same worker. Absent error-log entries are **inconclusive**.
+*   Inventory every PHP install, including embedded ones behind appliances and containers. Verify the **web SAPI** build (\`mod_php\`/FPM) separately from \`php -v\` on the CLI, then restart all workers.
+
+---
+
+## Bottom line
+
+Unauthenticated RCE, actively exploited before disclosure, worst under \`mod_php\` where it fires before your code runs. Patch to the fixed branch, restart every worker, verify the web SAPI, and apply the per-CVE mitigations only as a stopgap. Walk the full mechanism, attack path, and detection rules in the [**interactive explainer**](blogs/php2shell.html).`
+    },
+    {
       "slug": "agentic-red-teaming-autonomous-offensive-operator-pwc-cyber-summit",
       "title": "Agentic Red Teaming: Building an Autonomous Offensive Operator with Local AI",
       "date": "September 20, 2026",
